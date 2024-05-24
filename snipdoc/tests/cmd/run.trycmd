@@ -13,11 +13,11 @@ Injected   : 5
 Not Found  : 2
 Error      : 1
 
-Not Found:
+Snippets to inject not found:
  - README.md, snippet id: not-found-snippet-to-inject
  - README.md, snippet id: should-ignore
 
-Errors:
+Found errors in the following files:
  - error-parsing.rs :  --> 2:1
   |
 2 | 

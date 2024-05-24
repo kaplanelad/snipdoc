@@ -1,0 +1,4 @@
+includes:
+excludes:
+- examples/ignore-.*
+exclude_file_path:

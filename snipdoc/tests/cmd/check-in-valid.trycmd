@@ -1,0 +1,19 @@
+```console
+$ snipdoc check
+? 1
+
+Snippets should updated in:
+ - README.md
+
+Found errors in the following files:
+ - examples/ignore-snippet-from-config/ignores.md :  --> 5:1
+  |
+5 | 
+  | ^---
+  |
+  = expected comment or tag_close
+
+Snippets to inject not found:
+ - README.md, snippet id: not-found
+
+```
