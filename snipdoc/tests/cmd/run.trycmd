@@ -1,0 +1,31 @@
+```console
+$ snipdoc run
+==============================
+       Snipdoc 
+==============================
+
+Overall Summary:
+Folder                : [CWD]
+
+Detailed Summary by Action Type:
+Equal      : 1
+Injected   : 5
+Not Found  : 2
+Error      : 1
+
+Not Found:
+ - README.md, snippet id: not-found-snippet-to-inject
+ - README.md, snippet id: should-ignore
+
+Errors:
+ - error-parsing.rs :  --> 2:1
+  |
+2 | 
+  | ^---
+  |
+  = expected comment or tag_close
+
+Injected In Files:
+ - README.md
+
+```

@@ -1,0 +1,77 @@
+```console
+$ snipdoc show --format console
+Found 2 snippets
+1     Code       from_code                                [CWD]/test.rs
+2     Yaml       from_yaml                                ./snipdoc.yml
+
+```
+
+```console
+$ snipdoc show --from code --format console
+Found 1 snippets
+1     Code       from_code                                [CWD]/test.rs
+
+```
+
+```console
+$ snipdoc show --from yaml --format console
+Found 1 snippets
+1     Yaml       from_yaml                                ./snipdoc.yml
+
+```
+
+```console
+$ snipdoc show --from any --format console
+Found 2 snippets
+1     Code       from_code                                [CWD]/test.rs
+2     Yaml       from_yaml                                ./snipdoc.yml
+
+```
+
+```console
+$ snipdoc show --format table
+Found 2 snippets
+┌───┬──────────────┬───────────┬───────────────┐
+│ # │ Snippet Kind │ ID        │ Path          │
+├───┼──────────────┼───────────┼───────────────┤
+│ 1 │ Code         │ from_code │ test.rs       │
+├───┼──────────────┼───────────┼───────────────┤
+│ 2 │ Yaml         │ from_yaml │ ./snipdoc.yml │
+└───┴──────────────┴───────────┴───────────────┘
+
+```
+
+```console
+$ snipdoc show --from code --format table
+Found 1 snippets
+┌───┬──────────────┬───────────┬─────────┐
+│ # │ Snippet Kind │ ID        │ Path    │
+├───┼──────────────┼───────────┼─────────┤
+│ 1 │ Code         │ from_code │ test.rs │
+└───┴──────────────┴───────────┴─────────┘
+
+```
+
+```console
+$ snipdoc show --from yaml --format table
+Found 1 snippets
+┌───┬──────────────┬───────────┬───────────────┐
+│ # │ Snippet Kind │ ID        │ Path          │
+├───┼──────────────┼───────────┼───────────────┤
+│ 1 │ Yaml         │ from_yaml │ ./snipdoc.yml │
+└───┴──────────────┴───────────┴───────────────┘
+
+```
+
+```console
+$ snipdoc show --from any --format table
+Found 2 snippets
+┌───┬──────────────┬───────────┬───────────────┐
+│ # │ Snippet Kind │ ID        │ Path          │
+├───┼──────────────┼───────────┼───────────────┤
+│ 1 │ Code         │ from_code │ test.rs       │
+├───┼──────────────┼───────────┼───────────────┤
+│ 2 │ Yaml         │ from_yaml │ ./snipdoc.yml │
+└───┴──────────────┴───────────┴───────────────┘
+
+```

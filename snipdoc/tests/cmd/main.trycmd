@@ -1,0 +1,99 @@
+```console
+$ snipdoc
+? 2
+Code Documentation Made Simple
+
+Usage: snipdoc[EXE] [OPTIONS] [PATH] <COMMAND>
+
+Commands:
+  create-db  Create a local DB file
+  run        Inject snippet into placeholders
+  show       Show snippets
+  help       Print this message or the help of the given subcommand(s)
+
+Arguments:
+  [PATH]  Source code directory for collecting documentation [default: .]
+
+Options:
+  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
+  -h, --help                   Print help
+  -V, --version                Print version
+
+```
+
+```console
+$ snipdoc --help
+Code Documentation Made Simple
+
+Usage: snipdoc[EXE] [OPTIONS] [PATH] <COMMAND>
+
+Commands:
+  create-db  Create a local DB file
+  run        Inject snippet into placeholders
+  show       Show snippets
+  help       Print this message or the help of the given subcommand(s)
+
+Arguments:
+  [PATH]  Source code directory for collecting documentation [default: .]
+
+Options:
+  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
+  -h, --help                   Print help
+  -V, --version                Print version
+
+```
+
+```console
+$ snipdoc create-db --help
+Create a local DB file
+
+Usage: snipdoc[EXE] create-db [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]  Source code directory for collecting documentation [default: .]
+
+Options:
+      --empty                  Show the injection operation without changes
+  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
+  -h, --help                   Print help
+  -V, --version                Print version
+
+```
+
+```console
+$ snipdoc run --help
+Inject snippet into placeholders
+
+Usage: snipdoc[EXE] run [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]  Source code directory for collecting documentation [default: .]
+
+Options:
+      --db-file <DB_FILE>      
+  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
+      --dry-run                Show the injection operation without changes
+      --format <FORMAT>        Format of the results [default: console] [possible values: table, console]
+  -h, --help                   Print help
+  -V, --version                Print version
+
+```
+
+```console
+$ snipdoc show --help
+Show snippets
+
+Usage: snipdoc show [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]  Source code directory for collecting documentation [default: .]
+
+Options:
+      --from <FROM>            [default: any] [possible values: yaml, code, any]
+  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
+      --db-file <DB_FILE>      
+      --format <FORMAT>        Format of the results [default: console] [possible values: table, console]
+  -h, --help                   Print help
+  -V, --version                Print version
+
+```

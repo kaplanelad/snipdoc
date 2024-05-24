@@ -1,0 +1,5 @@
+snippets:
+  title:
+    content: '! # Snipdoc: Code Documentation Made Simple'
+    kind: Yaml
+    path: ./snipdoc.yml

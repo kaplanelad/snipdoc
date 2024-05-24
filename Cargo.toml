@@ -1,0 +1,3 @@
+[workspace]
+members = ["snipdoc"]
+resolver = "1"

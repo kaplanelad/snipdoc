@@ -1,0 +1,7 @@
+snippets:
+  from_yaml:
+    content: |-
+      //! # Snipdoc: Code Documentation Made Simple
+      // </snip>
+    kind: Yaml
+    path: ./snipdoc.yml

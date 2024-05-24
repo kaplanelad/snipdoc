@@ -1,0 +1,5 @@
+snippets:
+  EXAMPLE_ID:
+    content: ''
+    kind: Yaml
+    path: ./snipdoc.yml

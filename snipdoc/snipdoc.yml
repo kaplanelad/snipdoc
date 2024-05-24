@@ -1,0 +1,6 @@
+snippets:
+  tool-usage:
+    content: |
+      asdasd
+    kind: Yaml
+    path: ./snipdoc.yml

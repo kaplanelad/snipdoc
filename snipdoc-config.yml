@@ -1,0 +1,5 @@
+includes:
+excludes:
+  - snipdoc/tests
+  - snipdoc/src/snippet.pest
+exclude_file_path:

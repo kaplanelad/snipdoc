@@ -1,0 +1,5 @@
+```console
+$ snipdoc create-db
+Wrote db file in path: ./snipdoc.yml
+
+```
