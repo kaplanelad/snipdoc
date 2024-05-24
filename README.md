@@ -71,5 +71,11 @@ For a live example, run the following command inside your project:
    snipdoc run ./snipdoc/examples/inject
    ```
 
+### Check
 
+validate that all snippets are valid and match the current injected versions. 
+It is useful for incorporating into CI workflows to ensure documentation accuracy and consistency.
 
+```sh
+snipdoc check
+```

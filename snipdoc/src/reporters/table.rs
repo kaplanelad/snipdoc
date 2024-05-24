@@ -1,12 +1,13 @@
-use std::{
-    collections::BTreeMap,
-    path::{Path, PathBuf},
-};
+use std::{collections::BTreeMap, path::Path};
 
 use tabled::{builder::Builder, settings::Style};
 
 use super::ReporterOutput;
-use crate::{db::Snippet, parser::injector::InjectAction, processor::InjectResult};
+use crate::{
+    db::Snippet,
+    parser::injector::InjectAction,
+    processor::{InjectContentResult, InjectResults},
+};
 
 pub struct Output {}
 
@@ -41,17 +42,17 @@ impl ReporterOutput for Output {
         println!("{}", builder.build().with(Style::modern()));
     }
 
-    fn inject(&self, root_folder: &Path, result: &BTreeMap<PathBuf, InjectResult>) {
+    fn inject(&self, root_folder: &Path, result: &InjectResults) {
         let mut builder = Builder::default();
         builder.push_record(["Path", "Action", "Snippet ID", ""]);
 
-        for (file, status) in result {
+        for (file, status) in result.iter() {
             let path_view = std::fs::canonicalize(root_folder)
                 .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
                 .unwrap_or(file);
 
             match status {
-                InjectResult::Injected(summary) => {
+                InjectContentResult::Injected(summary) => {
                     for action in &summary.actions {
                         match action {
                             InjectAction::Equal { snippet_id } => {
@@ -87,8 +88,8 @@ impl ReporterOutput for Output {
                         }
                     }
                 }
-                InjectResult::None => (),
-                InjectResult::Error(error) => {
+                InjectContentResult::None => (),
+                InjectContentResult::Error(error) => {
                     builder.push_record([
                         format!("{}", path_view.display()),
                         "error".to_string(),

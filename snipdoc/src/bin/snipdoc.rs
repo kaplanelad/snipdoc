@@ -48,6 +48,11 @@ enum Commands {
         #[clap(long, action=ArgAction::SetTrue)]
         empty: bool,
     },
+    /// Validate if snippets are equal, errors or missing configuration
+    Check {
+        #[arg(long, default_value = None)]
+        db_file: Option<PathBuf>,
+    },
     /// Inject snippet into placeholders
     Run {
         #[arg(long, default_value = None)]
@@ -93,6 +98,7 @@ fn main() {
 
     match app.command {
         Commands::CreateDb { empty } => cmd::create_db::exec(app.path.as_path(), empty),
+        Commands::Check { db_file } => cmd::check::exec(app.path.as_path(), db_file),
         Commands::Run {
             db_file,
             dry_run,

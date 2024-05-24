@@ -6,22 +6,14 @@ use std::{
 use console::style;
 
 use super::ReporterOutput;
-use crate::{db::Snippet, parser::injector::InjectAction, processor::InjectResult};
+use crate::{
+    db::Snippet,
+    processor::{InjectResults, InjectStats},
+};
 
 pub struct Output {}
 
 impl Output {}
-
-#[derive(Default)]
-struct CalculateData<'a> {
-    actions: usize,
-    errors: BTreeMap<&'a PathBuf, &'a String>,
-    inject_count: usize,
-    inject_files: HashSet<&'a PathBuf>,
-    not_found: BTreeMap<&'a PathBuf, HashSet<&'a String>>,
-    not_found_count: usize,
-    equal: usize,
-}
 
 impl ReporterOutput for Output {
     fn snippets(&self, _: &Path, snippets: &BTreeMap<String, Snippet>) {
@@ -45,44 +37,8 @@ impl ReporterOutput for Output {
         }
     }
 
-    #[allow(clippy::too_many_lines)]
-    fn inject(&self, root_folder: &Path, result: &BTreeMap<PathBuf, InjectResult>) {
-        let mut data = CalculateData::default();
-
-        for (file, status) in result {
-            match status {
-                InjectResult::Injected(summary) => {
-                    for action in &summary.actions {
-                        match action {
-                            InjectAction::Equal { snippet_id: _ } => data.equal += 1,
-                            InjectAction::Injected {
-                                snippet_id: _,
-                                content: _,
-                            } => {
-                                data.inject_files.insert(file);
-                                data.inject_count += 1;
-                                data.actions += 1;
-                            }
-                            InjectAction::NotFound {
-                                snippet_id,
-                                snippet_kind: _,
-                            } => {
-                                // data.not_found.insert(snippet_id);
-                                data.not_found
-                                    .entry(file)
-                                    .or_insert_with(|| HashSet::from([snippet_id]))
-                                    .insert(snippet_id);
-                                data.not_found_count += 1;
-                            }
-                        }
-                    }
-                }
-                InjectResult::None => (),
-                InjectResult::Error(err) => {
-                    data.errors.insert(file, err);
-                }
-            };
-        }
+    fn inject(&self, root_folder: &Path, result: &InjectResults) {
+        let stats = result.stats();
 
         println!("==============================");
         println!("{}", style("       Snipdoc ").green().bold());
@@ -97,66 +53,106 @@ impl ReporterOutput for Output {
         );
         println!();
         println!("{}", style("Detailed Summary by Action Type:").bold());
-        println!("{}", style(format!("Equal      : {}", data.equal)).cyan());
+        println!("{}", style(format!("Equal      : {}", stats.equals)).cyan());
         println!(
             "{}",
-            style(format!("Injected   : {}", style(data.inject_count))).green()
+            style(format!("Injected   : {}", style(stats.injects))).green()
         );
 
-        if !data.not_found.is_empty() {
+        if !stats.not_found.is_empty() {
             println!(
                 "{}",
-                style(format!("Not Found  : {}", data.not_found_count)).yellow()
+                style(format!("Not Found  : {}", stats.not_found_count)).yellow()
             );
         }
-        if !data.errors.is_empty() {
+        if !stats.errors.is_empty() {
             println!(
                 "{}",
-                style(format!("Error      : {}", data.errors.len())).red()
+                style(format!("Error      : {}", stats.errors.len())).red()
             );
         }
 
-        if !data.not_found.is_empty() {
-            println!();
-            println!("{}", style("Not Found:").bold());
-
-            let mut entries: Vec<_> = data.not_found.iter().collect();
-            entries.sort_by(|(file1, _), (file2, _)| file1.cmp(file2));
-
-            for (file, snippet_ids) in entries {
-                let path_view = std::fs::canonicalize(root_folder)
-                    .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
-                    .unwrap_or(file);
-
-                let mut sorted_snippet_ids: Vec<_> = snippet_ids.iter().copied().collect();
-                sorted_snippet_ids.sort();
-
-                for snippet_id in sorted_snippet_ids {
-                    println!(" - {}, snippet id: {}", path_view.display(), snippet_id);
-                }
-            }
+        if !stats.not_found.is_empty() {
+            Self::print_not_found_snippets_to_inject(root_folder, &stats.not_found);
         }
 
-        if !data.errors.is_empty() {
-            println!();
-            println!("{}", style("Errors:").bold());
-            for (file, error_msg) in data.errors {
-                let path_view = std::fs::canonicalize(root_folder)
-                    .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
-                    .unwrap_or(file);
-
-                println!(" - {} : {error_msg}", path_view.display());
-            }
+        if !stats.errors.is_empty() {
+            Self::print_errors(root_folder, &stats.errors);
         }
 
-        if !data.inject_files.is_empty() {
-            println!();
-            println!("Injected In Files:");
-            for file in data.inject_files {
-                let path_view = std::fs::canonicalize(root_folder)
-                    .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
-                    .unwrap_or(file);
-                println!(" - {}", path_view.display());
+        if !stats.inject_unique_files.is_empty() {
+            Self::print_inject_files(
+                root_folder,
+                "Injected In Files:",
+                &stats.inject_unique_files,
+            );
+        }
+    }
+
+    fn check(&self, root_folder: &Path, stats: &InjectStats) {
+        if !stats.inject_unique_files.is_empty() {
+            Self::print_inject_files(
+                root_folder,
+                "Snippets should updated in:",
+                &stats.inject_unique_files,
+            );
+        }
+
+        if !stats.errors.is_empty() {
+            Self::print_errors(root_folder, &stats.errors);
+        }
+
+        if !stats.not_found.is_empty() {
+            Self::print_not_found_snippets_to_inject(root_folder, &stats.not_found);
+        }
+    }
+}
+
+impl Output {
+    fn print_errors(root_folder: &Path, errors: &BTreeMap<PathBuf, String>) {
+        println!();
+        println!("{}", style("Found errors in the following files:").bold());
+        for (file, error_msg) in errors {
+            let path_view = std::fs::canonicalize(root_folder)
+                .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
+                .unwrap_or(file);
+
+            println!(" - {} : {error_msg}", path_view.display());
+        }
+    }
+
+    fn print_inject_files(root_folder: &Path, title: &str, inject_files: &HashSet<PathBuf>) {
+        println!();
+        println!("{title}");
+        for file in inject_files {
+            let path_view = std::fs::canonicalize(root_folder)
+                .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
+                .unwrap_or(file);
+            println!(" - {}", path_view.display());
+        }
+    }
+
+    fn print_not_found_snippets_to_inject(
+        root_folder: &Path,
+        not_found: &BTreeMap<PathBuf, HashSet<String>>,
+    ) {
+        println!();
+        println!("{}", style("Snippets to inject not found:").bold());
+
+        let mut entries: Vec<_> = not_found.iter().collect();
+        entries.sort_by(|(file1, _), (file2, _)| file1.cmp(file2));
+
+        for (file, snippet_ids) in entries {
+            let path_view = std::fs::canonicalize(root_folder)
+                .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
+                .unwrap_or(file);
+
+            let mut sorted_snippet_ids: Vec<_> = snippet_ids.iter().cloned().collect();
+
+            sorted_snippet_ids.sort();
+
+            for snippet_id in sorted_snippet_ids {
+                println!(" - {}, snippet id: {}", path_view.display(), snippet_id);
             }
         }
     }

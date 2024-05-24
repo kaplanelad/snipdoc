@@ -7,7 +7,7 @@
 
 use std::{
     fs,
-    io::Write,
+    io::{self, Write},
     path::{Path, PathBuf},
 };
 
@@ -32,11 +32,32 @@ pub fn exec(
     dry_run: bool,
     format: &Format,
 ) -> CmdExit {
+    let injector = match run(inject_folder, db_file) {
+        Ok(i) => i,
+        Err(err) => {
+            return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));
+        }
+    };
+
+    if !dry_run {
+        for (path, status) in injector.results.iter() {
+            if let snipdoc::processor::InjectContentResult::Injected(summary) = status {
+                write_content(path.as_path(), &summary.content).unwrap();
+            }
+        }
+    }
+
+    format.reporter().inject(inject_folder, &injector.results);
+
+    CmdExit::ok()
+}
+
+pub fn run(inject_folder: &Path, db_file: Option<PathBuf>) -> io::Result<Injector> {
     // first search a snippets from the code
     let walk = match walk::Walk::new(inject_folder) {
         Ok(walk) => walk,
         Err(err) => {
-            return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));
+            return Err(err);
         }
     };
 
@@ -72,23 +93,11 @@ pub fn exec(
     let walk = match walk::Walk::from_config(inject_folder, &config) {
         Ok(walk) => walk,
         Err(err) => {
-            return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));
+            return Err(err);
         }
     };
 
-    let injector = Injector::on_files(&walk, &snippets);
-
-    if !dry_run {
-        for (path, status) in &injector.results {
-            if let snipdoc::processor::InjectResult::Injected(summary) = status {
-                write_content(path.as_path(), &summary.content).unwrap();
-            }
-        }
-    }
-
-    format.reporter().inject(inject_folder, &injector.results);
-
-    CmdExit::ok()
+    Ok(Injector::on_files(&walk, &snippets))
 }
 
 fn write_content(path: &Path, content: &str) -> std::io::Result<()> {

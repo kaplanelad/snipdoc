@@ -18,6 +18,15 @@ impl CmdExit {
     /// Creates a new [`CmdExit`] instance with an error message and exit code
     /// 1.
     #[must_use]
+    pub const fn error() -> Self {
+        Self {
+            code: 1,
+            message: None,
+        }
+    }
+    /// Creates a new [`CmdExit`] instance with an error message and exit code
+    /// 1.
+    #[must_use]
     pub fn error_with_message(message: &str) -> Self {
         Self {
             code: 1,

@@ -74,7 +74,15 @@
 //!    ```sh
 //!    snipdoc run ./snipdoc/examples/inject
 //!    ```
-
+//! ### Check
+//!
+//! validate that all snippets are valid and match the current injected
+//! versions.  It is useful for incorporating into CI workflows to ensure
+//! documentation accuracy and consistency.
+//!
+//! ```sh
+//!  snipdoc check
+//!  ```
 #[cfg(feature = "cli")]
 pub mod cli;
 pub mod db;
