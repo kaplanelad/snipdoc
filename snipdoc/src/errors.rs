@@ -10,6 +10,9 @@ pub enum ParseError {
     IO(#[from] std::io::Error),
 
     #[error(transparent)]
+    FromUtf8(#[from] std::string::FromUtf8Error),
+
+    #[error(transparent)]
     String(#[from] std::fmt::Error),
 
     #[error("{0}")]
