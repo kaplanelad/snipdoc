@@ -1,5 +1,13 @@
+Expected to inject `readme` from the code and strip the prefix `//!`
+<!-- <snip id="readme" inject_from="code" strip_prefix="//!"> -->
+
+ # Snipdoc: Code Documentation Made Simple
+ readme after title
+<!-- </snip> -->
+
+
 Expected to inject `title` from the code and strip the prefix `//!`
-<!-- <snip id="title" inject_from="code" strip_prefix="//!"> -->! # Snipdoc: Code Documentation Made Simple
+<!-- <snip id="title" inject_from="code" strip_prefix="//!"> --> # Snipdoc: Code Documentation Made Simple
 <!-- </snip> -->
 
 Expected to inject `rust-print` from the code 

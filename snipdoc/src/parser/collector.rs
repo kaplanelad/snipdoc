@@ -67,21 +67,14 @@ pub fn collect_snippets(pairs: Pairs<'_, Rule>, snippets: &mut Vec<CollectSnippe
                     "found attributes"
                 );
 
-                let mut lines = children
-                    .clone()
-                    .nth(1)
-                    // the parsing configuration always captures a snippet content. If indicates a
-                    // misconfiguration or a critical issue in the parser's behavior. Consequently,
-                    // in production code, encountering this panic indicates a severe problem that
-                    // requires immediate attention. this assumption is In testing scenarios, this
-                    // panic should be captured to ensure the correctness of the parser.
-                    // violated, it
-                    .unwrap()
+                let mut lines = pair
                     .as_str()
                     .split('\n')
                     .map(std::string::ToString::to_string)
+                    .skip(1)
                     .collect::<Vec<_>>();
 
+                lines.pop();
                 lines.pop();
 
                 snippets.push(CollectSnippet {

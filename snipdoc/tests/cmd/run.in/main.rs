@@ -1,5 +1,9 @@
+// <snip id="readme">
+//!
 // <snip id="title">
 //! # Snipdoc: Code Documentation Made Simple
+// </snip>
+//! readme after title
 // </snip>
 ///
 // <snip id="rust-print">

@@ -1,3 +1,8 @@
+Expected to inject `readme` from the code and strip the prefix `//!`
+<!-- <snip id="readme" inject_from="code" strip_prefix="//!"> -->
+<!-- </snip> -->
+
+
 Expected to inject `title` from the code and strip the prefix `//!`
 <!-- <snip id="title" inject_from="code" strip_prefix="//!"> --><!-- </snip> -->
 
