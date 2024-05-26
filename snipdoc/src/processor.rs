@@ -124,7 +124,7 @@ impl Collector {
     ///
     /// Returns `Some` containing the collected snippets if successful,
     /// otherwise returns `None`.
-    fn on_file(path: &Path) -> ParserResult<Vec<CollectSnippet>> {
+    fn on_file(path: &Path) -> ParserResult<'_, Vec<CollectSnippet>> {
         let span = tracing::info_span!("parse_file", path = %path.display());
         let _guard = span.enter();
 
