@@ -3,8 +3,8 @@
 
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
-    fs::{self, File},
-    io::{self, BufReader, Read},
+    fs::File,
+    io::Read,
     path::{Path, PathBuf},
 };
 
@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     db::{DBData, Snippet},
+    errors::ParserResult,
     parser::{
         collector::CollectSnippet,
         injector::{InjectAction, InjectSummary},
@@ -123,22 +124,13 @@ impl Collector {
     ///
     /// Returns `Some` containing the collected snippets if successful,
     /// otherwise returns `None`.
-    fn on_file(path: &Path) -> Option<Vec<CollectSnippet>> {
+    fn on_file(path: &Path) -> ParserResult<Vec<CollectSnippet>> {
         let span = tracing::info_span!("parse_file", path = %path.display());
         let _guard = span.enter();
 
-        let input = read_file_content_if_utf8(path)?;
+        let input = read_file(path)?;
 
-        match ParseFile::new(&input).parse() {
-            Ok(findings) => {
-                tracing::debug!("parsed successfully");
-                Some(findings)
-            }
-            Err(err) => {
-                tracing::debug!(err = %err, "could not parse the file");
-                None
-            }
-        }
+        ParseFile::new(&input).parse()
     }
 }
 
@@ -156,11 +148,12 @@ impl Injector {
         let results = walk
             .get_files()
             .par_iter()
-            .filter_map(|path| {
-                read_file_content_if_utf8(path).map(|content| {
+            .filter_map(|path| match read_file(path) {
+                Ok(content) => {
                     let status = Self::inject(&content, &snippets_from);
-                    (path.clone(), status)
-                })
+                    Some((path.clone(), status))
+                }
+                Err(_err) => None,
             })
             .collect::<BTreeMap<PathBuf, InjectContentResult>>();
 
@@ -195,39 +188,10 @@ impl Injector {
     }
 }
 
-fn is_utf8_file<P: AsRef<Path>>(path: P) -> io::Result<bool> {
-    let file = File::open(path)?;
-    let mut reader = BufReader::new(file);
-    let mut buffer = [0; 4096];
+fn read_file<P: AsRef<Path>>(path: P) -> ParserResult<'static, String> {
+    let mut file = File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
 
-    while let Ok(n) = reader.read(&mut buffer) {
-        if n == 0 {
-            break;
-        }
-        if std::str::from_utf8(&buffer[..n]).is_err() {
-            return Ok(false);
-        }
-    }
-
-    Ok(true)
-}
-
-fn read_file_content_if_utf8<P: AsRef<Path>>(path: P) -> Option<String> {
-    match is_utf8_file(&path) {
-        Ok(true) => match fs::read_to_string(path) {
-            Ok(content) => Some(content),
-            Err(err) => {
-                tracing::debug!(err = %err, "could not read file content");
-                None
-            }
-        },
-        Ok(false) => {
-            tracing::trace!("filter out non-UTF-8 files");
-            None
-        }
-        Err(err) => {
-            tracing::debug!(err = %err, "could not read file content");
-            None
-        }
-    }
+    Ok(String::from_utf8(buffer)?)
 }
