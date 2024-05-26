@@ -1,7 +1,0 @@
-snippets:
-  SNIPPET_FROM_YAML:
-    content: |2-
-           THIS SNIPPET FROM YAML FILE
-      <!-- </snip> -->
-    kind: Yaml
-    path: ./snipdoc/examples/inject/snipdoc.yml

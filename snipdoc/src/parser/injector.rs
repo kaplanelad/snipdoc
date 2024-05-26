@@ -1,4 +1,9 @@
-use std::{collections::HashMap, fmt::Write, hash::BuildHasher, str::FromStr};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt::Write,
+    hash::BuildHasher,
+    str::FromStr,
+};
 
 use pest::iterators::Pairs;
 use serde::{Deserialize, Serialize};
@@ -12,6 +17,7 @@ use crate::{
 const INJECT_FROM_ATTRIBUTE_NAME: &str = "inject_from";
 const STRIP_PREFIX_ATTRIBUTE_NAME: &str = "strip_prefix";
 const ADD_PREFIX_ATTRIBUTE_NAME: &str = "add_prefix";
+const ADD_TEMPLATE: &str = "template";
 
 /// A struct representing the injection summary result.
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -21,6 +27,47 @@ pub struct InjectSummary {
     pub content: String,
     /// Represent the action that occurred.
     pub actions: Vec<InjectAction>,
+}
+
+pub struct InjectContentAction {
+    pub snippet_id: String,
+    pub inject_from: SnippetKind,
+    pub strip_prefix: Option<String>,
+    pub add_prefix: Option<String>,
+    pub template: Option<String>,
+}
+
+impl InjectContentAction {
+    pub fn new(attributes: &BTreeMap<String, String>) -> Option<Self> {
+        let snippet_id = attributes.get("id").or({
+            tracing::debug!(
+                attributes = format!("{:?}", attributes),
+                "attribute id not found in the given attributes"
+            );
+            None
+        })?;
+
+        let inject_from = attributes.get(INJECT_FROM_ATTRIBUTE_NAME).or({
+            tracing::debug!(
+                attributes = format!("{:?}", attributes),
+                "attribute inject_from not found in the given attributes"
+            );
+            None
+        })?;
+
+        let Ok(inject_from) = SnippetKind::from_str(inject_from) else {
+            tracing::debug!(inject_from, "invalid inject_from kind.");
+            return None;
+        };
+
+        Some(Self {
+            snippet_id: snippet_id.to_string(),
+            inject_from,
+            strip_prefix: attributes.get(STRIP_PREFIX_ATTRIBUTE_NAME).cloned(),
+            add_prefix: attributes.get(ADD_PREFIX_ATTRIBUTE_NAME).cloned(),
+            template: attributes.get(ADD_TEMPLATE).cloned(),
+        })
+    }
 }
 
 /// The action which occurred
@@ -80,31 +127,14 @@ pub fn inject_snippets<'a, S: BuildHasher>(
                 }
             };
 
-            let snippet_id = attributes
-                .get("id")
-                .expect("assertion fails, snippet without element id");
+            let inject_content_actions = InjectContentAction::new(&attributes);
 
-            let maybe_inject_from = {
-                attributes.get(INJECT_FROM_ATTRIBUTE_NAME).and_then(|k| {
-                    SnippetKind::from_str(k).map_or_else(
-                        |()| {
-                            tracing::debug!(inject_from = k, "invalid inject_from kind.");
-                            None
-                        },
-                        Some,
-                    )
-                })
-            };
-
-            if let Some(inject_from) = maybe_inject_from {
-                if let Some(snippet) = snippets.get(snippet_id) {
-                    if inject_from == SnippetKind::Any || inject_from == snippet.kind {
-                        let snippet_content = snippet
-                            .get_content(
-                                attributes.get(STRIP_PREFIX_ATTRIBUTE_NAME),
-                                attributes.get(ADD_PREFIX_ATTRIBUTE_NAME),
-                            )
-                            .join("\n");
+            if let Some(inject_actions) = inject_content_actions {
+                if let Some(snippet) = snippets.get(&inject_actions.snippet_id) {
+                    if inject_actions.inject_from == SnippetKind::Any
+                        || inject_actions.inject_from == snippet.kind
+                    {
+                        let snippet_content = snippet.get_content(&inject_actions).join("\n");
 
                         let comment_tag = html_tag::get_comment_tag_open(&children);
                         let close_tag_of_tag_open =
@@ -119,11 +149,11 @@ pub fn inject_snippets<'a, S: BuildHasher>(
 
                         if pair.as_str() == inject_result {
                             summary.actions.push(InjectAction::Equal {
-                                snippet_id: snippet_id.to_string(),
+                                snippet_id: inject_actions.snippet_id.to_string(),
                             });
                         } else {
                             summary.actions.push(InjectAction::Injected {
-                                snippet_id: snippet_id.to_string(),
+                                snippet_id: inject_actions.snippet_id.to_string(),
                                 content: snippet_content,
                             });
                         }
@@ -132,8 +162,8 @@ pub fn inject_snippets<'a, S: BuildHasher>(
                     }
                 } else {
                     summary.actions.push(InjectAction::NotFound {
-                        snippet_id: snippet_id.to_string(),
-                        snippet_kind: inject_from,
+                        snippet_id: inject_actions.snippet_id.to_string(),
+                        snippet_kind: inject_actions.inject_from,
                     });
                     summary.content.write_str(pair.as_str())?;
                 }

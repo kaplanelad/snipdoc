@@ -1,6 +1,6 @@
 code       = @{ (!tag_open ~ !tag_close ~ ANY)* }
-comment    =  { ("//" | "///" | "<!--" | "-->" ) ~ WHITE_SPACE? }
-tag_text   = @{ ASCII_ALPHANUMERIC | "_" | "-" | "\"" | "="| "!" | "/" | WHITE_SPACE }
+comment    =  { ("#" | "//" | "///" | "<!--" | "-->" ) ~ WHITE_SPACE? }
+tag_text   = @{ ASCII_ALPHANUMERIC | "{" | "}" | "%" | "`" |"\\" | "_" | "-" | "\"" | "="| "!" | "/" | WHITE_SPACE }
 element_id =  { " id=\"" ~ (ASCII_ALPHANUMERIC | "_" | "-" )* ~ "\"" }
 tag        =  { "<snip" ~ element_id ~ tag_text* ~  ">" ~ WHITE_SPACE?  }
 tag_open   =  { comment ~ tag ~ WHITE_SPACE? ~ comment? } //  ~ NEWLINE
