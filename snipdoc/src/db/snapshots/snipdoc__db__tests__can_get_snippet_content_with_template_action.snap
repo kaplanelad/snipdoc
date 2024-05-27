@@ -1,0 +1,10 @@
+---
+source: snipdoc/src/db/mod.rs
+expression: snippet.get_content(&action)
+---
+[
+    "```sh",
+    "$ cargo install snipdoc",
+    "$ snipdoc --version",
+    "```",
+]

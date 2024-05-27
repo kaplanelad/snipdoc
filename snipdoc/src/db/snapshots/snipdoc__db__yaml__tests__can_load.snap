@@ -1,0 +1,20 @@
+---
+source: snipdoc/src/db/yaml.rs
+expression: yaml_db.load()
+---
+Ok(
+    DBData {
+        snippets: {
+            "one": Snippet {
+                content: "  THIS SNIPPET FROM YAML FILE\n  <!-- </snip> -->",
+                kind: Yaml,
+                path: "./snipdoc-snippets.yaml",
+            },
+            "two": Snippet {
+                content: "two",
+                kind: Yaml,
+                path: "./snipdoc-snippets.yaml",
+            },
+        },
+    },
+)

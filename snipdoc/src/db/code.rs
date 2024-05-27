@@ -44,3 +44,39 @@ impl Db for Code {
         Err(Error::NotSupported)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use insta::assert_debug_snapshot;
+
+    use super::*;
+    use crate::tests_cfg;
+
+    #[test]
+    fn can_load() {
+        let code = Code {
+            snippets: BTreeMap::from([(
+                PathBuf::from("README.md"),
+                tests_cfg::get_collect_snippets(),
+            )]),
+        };
+
+        assert_debug_snapshot!(code.load());
+    }
+
+    #[test]
+    fn can_save() {
+        let code = Code {
+            snippets: BTreeMap::new(),
+        };
+
+        let save_snippets = CollectSnippet {
+            id: "description".to_string(),
+            snippet: vec!["test".to_string(), "snipdoc".to_string()],
+            inject_from: None,
+            tag_open: "<snip id=\"description\">".to_string(),
+            tag_close: "<!-- </snip> -->\n".to_string(),
+        };
+        assert!(code.save(&[&save_snippets]).is_err());
+    }
+}

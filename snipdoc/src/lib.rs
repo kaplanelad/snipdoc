@@ -102,4 +102,6 @@ pub mod parser;
 pub mod processor;
 #[cfg(feature = "reporters")]
 pub mod reporters;
+#[cfg(test)]
+pub mod tests_cfg;
 pub mod walk;
