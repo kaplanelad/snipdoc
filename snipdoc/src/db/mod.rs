@@ -6,7 +6,7 @@ pub use code::Code;
 use serde::{Deserialize, Serialize};
 pub use yaml::{Yaml, DEFAULT_FILE_NAME};
 
-use crate::parser::collector::CollectSnippet;
+use crate::parser::{collector::CollectSnippet, injector::InjectContentAction};
 
 /// A trait that defines the behavior for database operations.
 pub trait Db {
@@ -74,23 +74,28 @@ impl Snippet {
     /// Returns the snippet content, filtered based on `strip_prefix` if
     /// specified.
     #[must_use]
-    pub fn get_content(
-        &self,
-        strip_prefix: Option<&String>,
-        add_prefix: Option<&String>,
-    ) -> Vec<String> {
-        self.content
+    pub fn get_content(&self, actions: &InjectContentAction) -> Vec<String> {
+        let content = actions.template.as_ref().map_or_else(
+            || self.content.to_string(),
+            |template| {
+                template
+                    .replace("{snippet}", &self.content)
+                    .replace("\\n", "\n")
+            },
+        );
+
+        content
             .split('\n')
             .filter_map(|line| {
                 if line.contains("<snip") || line.contains("</snip") {
                     return None;
                 }
-                let line = strip_prefix.map_or_else(
+                let line = actions.strip_prefix.as_ref().map_or_else(
                     || line.to_string(),
                     |prefix_inject| line.strip_prefix(prefix_inject).unwrap_or(line).to_string(),
                 );
 
-                if let Some(add_prefix) = add_prefix {
+                if let Some(add_prefix) = &actions.add_prefix {
                     Some(format!("{add_prefix}{line}"))
                 } else {
                     Some(line)

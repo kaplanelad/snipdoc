@@ -1,0 +1,8 @@
+# <snip id="config-template">
+snippets:
+  inject-from-yaml:
+    content: |-
+      Inject from YAML file
+    kind: Yaml
+    path: main.rs
+# </snip>
