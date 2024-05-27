@@ -1,0 +1,42 @@
+---
+source: snipdoc/src/parser/mod.rs
+expression: parser.inject(&snippet_refs)
+---
+Ok(
+    InjectSummary {
+        content: "# Snipdoc\n\n<!-- <snip id=\"installation\" inject_from=\"code\"> -->\n$ cargo install snipdoc\n$ snipdoc --version\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"yaml\"> -->\ninject_from_yaml\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"code\"> -->\n# Skip injection, `inject_from_yaml` snippet id not exists in code\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"any\"> -->\ninject_from_yaml\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\" add_prefix=\"//! \"> -->\n//! snipdoc\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\" strip_prefix=\"snip\"> -->\ndoc\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\" template=\"```sh\\n{snippet}\\n```\"> -->\n```sh\nsnipdoc\n```\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\"> -->\nsnipdoc\n<!-- </snip> -->\n\n<!-- <snip id=\"not-found\" inject_from=\"code\"> -->\nnot-found\n<!-- </snip> -->\n\n",
+        actions: [
+            Injected {
+                snippet_id: "installation",
+                content: "$ cargo install snipdoc\n$ snipdoc --version",
+            },
+            Injected {
+                snippet_id: "inject_from_yaml",
+                content: "inject_from_yaml",
+            },
+            Injected {
+                snippet_id: "inject_from_yaml",
+                content: "inject_from_yaml",
+            },
+            Injected {
+                snippet_id: "description",
+                content: "//! snipdoc",
+            },
+            Injected {
+                snippet_id: "description",
+                content: "doc",
+            },
+            Injected {
+                snippet_id: "description",
+                content: "```sh\nsnipdoc\n```",
+            },
+            Equal {
+                snippet_id: "description",
+            },
+            NotFound {
+                snippet_id: "not-found",
+                snippet_kind: Code,
+            },
+        ],
+    },
+)

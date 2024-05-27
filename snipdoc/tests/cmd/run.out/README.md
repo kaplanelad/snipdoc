@@ -66,7 +66,8 @@ Expected to inject the content of the snippet with the given template
  snippets:
   inject-from-yaml:
     content: |-
-      Inject from YAML file 
+      Inject from YAML file
+    path: main.rs 
  ```
 <!-- </snip> -->
 
@@ -76,6 +77,7 @@ Expected to inject the content of the snippet with the given template with a dif
  snippets:
   inject-from-yaml:
     content: |-
-      Inject from YAML file 
+      Inject from YAML file
+    path: main.rs 
  ```
 # </snip> 
