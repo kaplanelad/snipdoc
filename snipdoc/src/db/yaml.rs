@@ -1,14 +1,28 @@
 //! This module defines the local yaml database
 use std::{
+    collections::HashMap,
     fs::File,
     io::Write,
     path::{Path, PathBuf},
 };
 
+use serde::{Deserialize, Serialize};
+
 use super::{DBData, Db, Result, Snippet, SnippetKind};
 use crate::parser::collector::CollectSnippet;
 
 pub const DEFAULT_FILE_NAME: &str = "snipdoc.yml";
+
+#[derive(Serialize, Deserialize)]
+struct YamlSnippet {
+    pub content: String,
+    pub path: PathBuf,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+struct Data {
+    pub snippets: HashMap<String, YamlSnippet>,
+}
 
 pub struct Yaml {
     pub path: PathBuf,
@@ -40,21 +54,34 @@ impl Db for Yaml {
     ///
     /// return an error if the file not exists or not in the same schema.
     fn load(&self) -> Result<'_, DBData> {
-        Ok(serde_yaml::from_reader(std::fs::File::open(&self.path)?)?)
+        let yaml_data: Data = serde_yaml::from_reader(std::fs::File::open(&self.path)?)?;
+
+        let mut data = DBData::default();
+        for (id, snippet) in &yaml_data.snippets {
+            data.snippets.insert(
+                id.clone(),
+                Snippet {
+                    content: snippet.content.clone(),
+                    kind: SnippetKind::Yaml,
+                    path: snippet.path.clone(),
+                },
+            );
+        }
+
+        Ok(data)
     }
 
     /// Save snippets into a yaml file
     fn save(&self, snippets: &[&CollectSnippet]) -> Result<'_, ()> {
-        let mut data = DBData::default();
+        let mut data = Data::default();
 
         for snippet in snippets {
             // we should save only snippets and not the placeholders
             if snippet.inject_from.is_none() {
                 data.snippets.insert(
                     snippet.id.to_string(),
-                    Snippet {
+                    YamlSnippet {
                         content: snippet.snippet.join("\n"),
-                        kind: SnippetKind::Yaml,
                         path: self.path.clone(),
                     },
                 );
