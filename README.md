@@ -1,6 +1,5 @@
 # Snipdoc
 
-
 **Snipdoc** is a straightforward tool for managing documentation that includes code snippets.
 It collects snippets from your code or YAML files and injects them into various parts of your documentation, making the documentation process more efficient.
 
@@ -42,7 +41,18 @@ After adding the placeholder, run the following command:
 snipdoc run
 ```
 
-This command captures the `SNIPPET_ID` and injects the snippet into the placeholder.
+#### Inject attributes
+Following attributes are available when injecting the snippets as a attribute.
+
+##### add_prefix
+For adding a prefix for each snippet line use the `add_prefix` attribute. 
+
+##### strip_prefix
+For removing a prefix for each snippet line use `strip_prefix` attribute
+
+##### template
+Wrap the snippet content with a custom template use `template` attribute.
+
 
 ### Managing Snippets
 
