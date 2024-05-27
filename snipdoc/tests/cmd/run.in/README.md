@@ -51,6 +51,12 @@ Expected to skip inject, see in `snipdoc-config.yml` file that the path of this 
 
 
 Expected to inject the content of the snippet with the given template
-# <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```">
+<!-- <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```"> -->
 
-# </snip>
+<!-- </snip> -->
+
+
+Expected to inject the content of the snippet with the given template with a different comment tag
+# <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```"> 
+
+# </snip> 
