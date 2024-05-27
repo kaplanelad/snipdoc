@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use crate::{
     db::{Snippet, SnippetKind},
@@ -43,4 +43,34 @@ pub fn get_snippet() -> Snippet {
         kind: SnippetKind::Code,
         path: PathBuf::from("main.rs"),
     }
+}
+
+#[must_use]
+pub fn get_snippet_to_inject() -> HashMap<String, Snippet> {
+    HashMap::from([
+        (
+            "description".to_string(),
+            Snippet {
+                content: "snipdoc".to_string(),
+                kind: SnippetKind::Code,
+                path: PathBuf::from("main.rs"),
+            },
+        ),
+        (
+            "installation".to_string(),
+            Snippet {
+                content: "$ cargo install snipdoc\n$ snipdoc --version".to_string(),
+                kind: SnippetKind::Code,
+                path: PathBuf::from("main.rs"),
+            },
+        ),
+        (
+            "inject_from_yaml".to_string(),
+            Snippet {
+                content: "inject_from_yaml".to_string(),
+                kind: SnippetKind::Yaml,
+                path: PathBuf::from("main.rs"),
+            },
+        ),
+    ])
 }

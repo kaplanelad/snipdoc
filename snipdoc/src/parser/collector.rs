@@ -75,7 +75,12 @@ pub fn collect_snippets(pairs: Pairs<'_, Rule>, snippets: &mut Vec<CollectSnippe
                     .collect::<Vec<_>>();
 
                 lines.pop();
-                lines.pop();
+
+                if let Some(last) = lines.last() {
+                    if last == &tag_close.replace('\n', "") {
+                        lines.pop();
+                    }
+                }
 
                 snippets.push(CollectSnippet {
                     // Attribute ID as part of the parser configuration is

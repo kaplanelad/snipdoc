@@ -158,6 +158,10 @@ pub fn inject_snippets<'a, S: BuildHasher>(
                             });
                         }
                     } else {
+                        // summary.actions.push(InjectAction::NotFound {
+                        //     snippet_id: inject_actions.snippet_id.to_string(),
+                        //     snippet_kind: inject_actions.inject_from,
+                        // });
                         summary.content.write_str(pair.as_str())?;
                     }
                 } else {
