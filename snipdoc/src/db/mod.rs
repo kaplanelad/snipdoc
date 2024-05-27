@@ -40,7 +40,6 @@ pub struct DBData {
     pub snippets: BTreeMap<String, Snippet>,
 }
 
-#[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Snippet {
     pub content: String,
@@ -118,3 +117,82 @@ pub enum Error {
 }
 
 pub type Result<'a, T> = std::result::Result<T, Error>;
+
+#[cfg(test)]
+mod tests {
+    use insta::assert_debug_snapshot;
+
+    use super::*;
+    use crate::tests_cfg;
+
+    #[test]
+    fn can_get_snippet_content_without_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = InjectContentAction {
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: None,
+        };
+
+        assert_debug_snapshot!(snippet.get_content(&action));
+    }
+
+    #[test]
+    fn can_get_snippet_content_with_template_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = InjectContentAction {
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Some("```sh\n{snippet}\n```".to_string()),
+        };
+        assert_debug_snapshot!(snippet.get_content(&action));
+    }
+
+    #[test]
+    fn can_get_snippet_content_with_strip_prefix_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = InjectContentAction {
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: Some("$ ".to_string()),
+            add_prefix: None,
+            template: None,
+        };
+        assert_debug_snapshot!(snippet.get_content(&action));
+    }
+
+    #[test]
+    fn can_get_snippet_content_with_add_prefix_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = InjectContentAction {
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: Some("$".to_string()),
+            template: None,
+        };
+        assert_debug_snapshot!(snippet.get_content(&action));
+    }
+
+    #[test]
+    fn can_get_snippet_content_with_combination_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = InjectContentAction {
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: Some("$ ".to_string()),
+            add_prefix: Some("- ".to_string()),
+            template: Some("```sh\n{snippet}\n```".to_string()),
+        };
+        assert_debug_snapshot!(snippet.get_content(&action));
+    }
+}

@@ -1,0 +1,20 @@
+---
+source: snipdoc/src/db/code.rs
+expression: code.load()
+---
+Ok(
+    DBData {
+        snippets: {
+            "description": Snippet {
+                content: "test\nsnipdoc",
+                kind: Code,
+                path: "README.md",
+            },
+            "installation": Snippet {
+                content: "```\ncargo install snipdoc\n```",
+                kind: Code,
+                path: "README.md",
+            },
+        },
+    },
+)

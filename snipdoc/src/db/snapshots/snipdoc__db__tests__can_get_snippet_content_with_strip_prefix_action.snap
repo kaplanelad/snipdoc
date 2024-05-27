@@ -1,0 +1,8 @@
+---
+source: snipdoc/src/db/mod.rs
+expression: snippet.get_content(&action)
+---
+[
+    "cargo install snipdoc",
+    "snipdoc --version",
+]

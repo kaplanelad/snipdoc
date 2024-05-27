@@ -1,0 +1,7 @@
+---
+source: snipdoc/src/db/yaml.rs
+expression: "std::fs::read_to_string(db_file_path)"
+---
+Ok(
+    "snippets:\n  description:\n    content: |-\n      test\n      snipdoc\n    path: [PATH]/snipdoc.yml\n  installation:\n    content: |-\n      ```\n      cargo install snipdoc\n      ```\n    path: [PATH]/snipdoc.yml\n",
+)
