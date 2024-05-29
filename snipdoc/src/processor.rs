@@ -16,7 +16,7 @@ use crate::{
     errors::ParserResult,
     parser::{
         collector::CollectSnippet,
-        injector::{InjectAction, InjectSummary},
+        injector::{InjectStatus, InjectSummary},
         ParseFile,
     },
     walk::Walk,
@@ -55,12 +55,12 @@ impl InjectResults {
                 InjectContentResult::Injected(summary) => {
                     for action in &summary.actions {
                         match action {
-                            InjectAction::Equal { .. } => stats.equals += 1,
-                            InjectAction::Injected { .. } => {
+                            InjectStatus::Equal { .. } => stats.equals += 1,
+                            InjectStatus::Injected { .. } => {
                                 stats.injects += 1;
                                 stats.inject_unique_files.insert(file.clone());
                             }
-                            InjectAction::NotFound { snippet_id, .. } => {
+                            InjectStatus::NotFound { snippet_id, .. } => {
                                 stats
                                     .not_found
                                     .entry(file.clone())

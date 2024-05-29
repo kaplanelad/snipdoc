@@ -54,6 +54,25 @@ For removing a prefix for each snippet line use `strip_prefix` attribute
 Wrap the snippet content with a custom template use `template` attribute.
 
 
+##### Execute snippet 
+In case you want to inject content of command you can use `action="exec"`. this injection will run the snippet shell command and inject the output
+Snippet:
+```yaml
+snippets:
+  EXEC:
+    content: echo '1+1'= $((1+1))
+    path: ./snipdoc.yml
+```
+
+result:
+```
+<!-- <snip id="EXEC" inject_from="yaml" action="exec"> -->
+1+1= 2
+
+<!-- </snip> -->
+```
+
+
 ### Managing Snippets
 
 To manage all snippets effectively, run the following command:
