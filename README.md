@@ -1,4 +1,11 @@
-# Snipdoc
+<div align="center">
+  <img src="./media/logo.png"/>
+  <h1>Snipdoc</h1>
+  <h3>🐚 An async & dynamic ORM for Rust</h3>
+  [![crate](https://img.shields.io/crates/v/snipdoc.svg)](https://crates.io/crates/snipdoc)
+  [![docs](https://docs.rs/snipdoc/badge.svg)](https://docs.rs/snipdoc)
+</div>
+
 
 **Snipdoc** is a straightforward tool for managing documentation that includes code snippets.
 It collects snippets from your code or YAML files and injects them into various parts of your documentation, making the documentation process more efficient.
@@ -22,7 +29,7 @@ To collect snippets, follow these steps:
 ```
 3. You can hide the snippet from presentation using various comment styles:
     - In Markdown files (like readme.md), use HTML comments: `<!-- CONTENT HERE -->`
-    - In Rust file docs, use: `//! CONTENT HERE`
+    - In Rust file docs, use: `CONTENT HERE`
     - In Rust function docs, use: `/// CONTENT HERE`
     - Use appropriate comment tags for other file formats.
 
