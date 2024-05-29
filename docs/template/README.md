@@ -7,23 +7,24 @@ Let's demonstrate how to use the template attribute to wrap a snippet in a YAML 
 
 
 ### Original Snippet in Yaml file:
+```
 <!-- <snip id="example-template"> -->
 snippets:
-    test:
-        content: test
-        path: main.rs
+  test:
+    content: test
+    path: main.rs
 
 <!-- </snip> -->
-
+```
 ### Applying a Template:
 To wrap the snippet with a YAML code block, use the `template` attribute like this:
  
 <!-- <snip id="example-template" inject_from="code" template="```yaml\n{snippet}\n```"> -->
 ```yaml
 snippets:
-    test:
-        content: echo '1+1'= $((1+1))
-        path: main.rs
+  test:
+    content: test
+    path: main.rs
 
 ```
 <!-- </snip> -->

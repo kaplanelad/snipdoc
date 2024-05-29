@@ -36,16 +36,20 @@ snippets:
 To copy the snippet, use `inject_from="code"` or  `inject_from="code"` (depend of the data source). This will copy the snippet with the same ID and paste it into the destination.
 
 ### From Code:
+```
 <!-- <snip id="SNIPPET_ID_FROM_CODE" inject_from="code"> -->
 pub fn print() {
 println!("Snipdoc");
 }
 <!-- </snip> -->
+```
 
 ### From Yaml:
+```
 <!-- <snip id="SNIPPET_ID_FROM_YAML" inject_from="yaml"> -->
 cargo install snipdoc
 <!-- </snip> -->
+```
 
 ## Inject
 After construction the snippet rust the following command:

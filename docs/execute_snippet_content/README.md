@@ -7,13 +7,16 @@ This is useful when you want to add the result of a `--help` command to your doc
 Let's demonstrate how to use the action="exec" attribute.
 
 ### Original Snippet in Code:
+```
 <!-- <snip id="help-command"> -->
 snipdoc --help
 <!-- </snip> -->
+```
 
 ### Executing the Command:
 To execute the command and capture its output, add `action="exec"` to your injection snippet:
 
+```
 <!-- <snip id="help-command" inject_from="code" action="exec"> -->
 Code Documentation Made Simple
 
@@ -35,3 +38,4 @@ Options:
   -V, --version                Print version
 
 <!-- </snip> -->
+```

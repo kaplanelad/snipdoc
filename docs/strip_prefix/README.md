@@ -7,6 +7,7 @@ This is useful when you need to format the injected snippets by stripping out co
 Let's demonstrate how to use the `strip_prefix` attribute to remove the prefix from each line of the `example-strip-prefix` snippet.
 
 ### Original Snippet in Code:
+```
 <!-- <snip id="example-strip-prefix"> -->
 //! Snipdoc
 //!
@@ -16,11 +17,10 @@ Let's demonstrate how to use the `strip_prefix` attribute to remove the prefix f
 //! cargo install
 //! ```
 <!-- </snip> -->
-
+```
 ### Stripping Prefix from Snippet:
 To remove the prefix from each line (e.g., //!), use the `strip_prefix` attribute like this:
 
- 
 <!-- <snip id="example-strip-prefix" inject_from="code" strip_prefix="//!"> -->
  Snipdoc
 
