@@ -108,3 +108,26 @@ It is useful for incorporating into CI workflows to ensure documentation accurac
 ```sh
 snipdoc check
 ```
+
+#### Github Action
+```yaml
+name: docs
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - run: cargo install snipdoc        
+      - run: snipdoc check        
+```
