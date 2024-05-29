@@ -5,7 +5,7 @@ use tabled::{builder::Builder, settings::Style};
 use super::ReporterOutput;
 use crate::{
     db::Snippet,
-    parser::injector::InjectAction,
+    parser::injector::InjectStatus,
     processor::{InjectContentResult, InjectResults},
 };
 
@@ -55,7 +55,7 @@ impl ReporterOutput for Output {
                 InjectContentResult::Injected(summary) => {
                     for action in &summary.actions {
                         match action {
-                            InjectAction::Equal { snippet_id } => {
+                            InjectStatus::Equal { snippet_id } => {
                                 builder.push_record([
                                     format!("{}", path_view.display()),
                                     "equal".to_string(),
@@ -63,7 +63,7 @@ impl ReporterOutput for Output {
                                     String::new(),
                                 ]);
                             }
-                            InjectAction::Injected {
+                            InjectStatus::Injected {
                                 snippet_id,
                                 content: _,
                             } => {
@@ -74,7 +74,7 @@ impl ReporterOutput for Output {
                                     String::new(),
                                 ]);
                             }
-                            InjectAction::NotFound {
+                            InjectStatus::NotFound {
                                 snippet_id,
                                 snippet_kind,
                             } => {

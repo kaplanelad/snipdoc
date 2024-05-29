@@ -14,6 +14,7 @@ use crate::{
     errors::ParserResult,
 };
 
+const INJECT_ACTION: &str = "action";
 const INJECT_FROM_ATTRIBUTE_NAME: &str = "inject_from";
 const STRIP_PREFIX_ATTRIBUTE_NAME: &str = "strip_prefix";
 const ADD_PREFIX_ATTRIBUTE_NAME: &str = "add_prefix";
@@ -26,11 +27,30 @@ pub struct InjectSummary {
     /// logic
     pub content: String,
     /// Represent the action that occurred.
-    pub actions: Vec<InjectAction>,
+    pub actions: Vec<InjectStatus>,
+}
+
+#[derive(PartialEq, Eq)]
+pub enum InjectAction {
+    Copy,
+    Exec,
+}
+
+impl FromStr for InjectAction {
+    type Err = ();
+
+    fn from_str(input: &str) -> std::result::Result<Self, ()> {
+        match input {
+            "copy" => Ok(Self::Copy),
+            "exec" => Ok(Self::Exec),
+            _ => Err(()),
+        }
+    }
 }
 
 pub struct InjectContentAction {
     pub snippet_id: String,
+    pub kind: InjectAction,
     pub inject_from: SnippetKind,
     pub strip_prefix: Option<String>,
     pub add_prefix: Option<String>,
@@ -66,13 +86,17 @@ impl InjectContentAction {
             strip_prefix: attributes.get(STRIP_PREFIX_ATTRIBUTE_NAME).cloned(),
             add_prefix: attributes.get(ADD_PREFIX_ATTRIBUTE_NAME).cloned(),
             template: attributes.get(ADD_TEMPLATE).cloned(),
+            kind: attributes
+                .get(INJECT_ACTION)
+                .and_then(|a| InjectAction::from_str(a).ok())
+                .unwrap_or(InjectAction::Copy),
         })
     }
 }
 
 /// The action which occurred
 #[derive(Debug, Serialize, Deserialize)]
-pub enum InjectAction {
+pub enum InjectStatus {
     /// The snippet found and contains the same content
     Equal { snippet_id: String },
     /// The snippet found and the content was injected
@@ -148,24 +172,24 @@ pub fn inject_snippets<'a, S: BuildHasher>(
                         summary.content.write_str(&inject_result)?;
 
                         if pair.as_str() == inject_result {
-                            summary.actions.push(InjectAction::Equal {
+                            summary.actions.push(InjectStatus::Equal {
                                 snippet_id: inject_actions.snippet_id.to_string(),
                             });
                         } else {
-                            summary.actions.push(InjectAction::Injected {
+                            summary.actions.push(InjectStatus::Injected {
                                 snippet_id: inject_actions.snippet_id.to_string(),
                                 content: snippet_content,
                             });
                         }
                     } else {
-                        // summary.actions.push(InjectAction::NotFound {
+                        // summary.actions.push(InjectStatus::NotFound {
                         //     snippet_id: inject_actions.snippet_id.to_string(),
                         //     snippet_kind: inject_actions.inject_from,
                         // });
                         summary.content.write_str(pair.as_str())?;
                     }
                 } else {
-                    summary.actions.push(InjectAction::NotFound {
+                    summary.actions.push(InjectStatus::NotFound {
                         snippet_id: inject_actions.snippet_id.to_string(),
                         snippet_kind: inject_actions.inject_from,
                     });
