@@ -1,8 +1,0 @@
-snippets:
-  SNIPPET_FROM_YAML:
-    content: |2-
-           THIS SNIPPET FROM YAML FILE
-    path: ./snipdoc/examples/inject/snipdoc.yml
-  EXEC:
-    content: echo '1+1'= $((1+1))
-    path: ./snipdoc/examples/inject/snipdoc.yml

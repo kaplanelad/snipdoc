@@ -7,79 +7,49 @@
   [![docs](https://docs.rs/snipdoc/badge.svg)](https://docs.rs/snipdoc)
 </div>
 
-
-
 **Snipdoc** is a straightforward tool for managing documentation that includes code snippets.
 It collects snippets from your code or YAML files and injects them into various parts of your documentation, making the documentation process more efficient.
 
 ## Installation
-#### Cargo install:
+To install Snipdoc, you can use Cargo:
 ```sh
 cargo install snipdoc
 ```
-Or download from the [GitHub Repository.](https://github.com/kaplanelad/snipdoc/releases/latest)
-## Getting started:
 
-### Collecting Snippets
-To collect snippets, follow these steps:
-1. Identify the piece of content in your code that you want to grab.
-2. Wrap the snippet with the following tag:
-```text
-// <snip id="SNIPPET_ID">
-     CONTENT HERE
-// </snip>
-```
-3. You can hide the snippet from presentation using various comment styles:
-    - In Markdown files (like readme.md), use HTML comments: `<!-- CONTENT HERE -->`
-    - In Rust file docs, use: `CONTENT HERE`
-    - In Rust function docs, use: `/// CONTENT HERE`
-    - Use appropriate comment tags for other file formats.
+Or download it from the [GitHub Repository.](https://github.com/kaplanelad/snipdoc/releases/latest)
 
-### Injecting Snippets
-To inject snippets, create an empty placeholder with the snippet ID and add `inject_from="code"` attribute like this:
-
-```text
-<!-- <snip id="SNIPPET_ID" inject_from="code"> -->
-     CONTENT HERE
-<!-- </snip> -->
-```
-
-After adding the placeholder, run the following command:
-
+## Getting Started
+To collect and replace all snippets from multiple data sources, use:
 ```sh
 snipdoc run
 ```
+For a detailed guide on how it works, follow this [guid](./docs/inject/)
+ 
+### Inject Options
+Snipdoc provides several attributes to customize snippet injection:
 
-#### Inject attributes
-Following attributes are available when injecting the snippets as a attribute.
+#### Adding a Prefix to Snippets
+The `add_prefix` attribute allows you to prepend a specified string to each line of the snippet. 
+This is useful when you need to format the injected snippets with a specific prefix, such as for comments in code blocks.
 
-##### add_prefix
-For adding a prefix for each snippet line use the `add_prefix` attribute. 
+[Check out this example](./docs/add_prefix)
 
-##### strip_prefix
-For removing a prefix for each snippet line use `strip_prefix` attribute
+#### Removing a Prefix from Snippets
+The `strip_prefix` attribute allows you to remove a specified string from the beginning of each line in the snippet. 
+This is useful when you need to format the injected snippets by stripping out comment prefixes or other unwanted characters.
 
-##### template
-Wrap the snippet content with a custom template use `template` attribute.
+[Check out this example](./docs/strip_prefix/)
 
+#### Using Templates
+The `template` attribute allows you to wrap your snippet with a given template. This is useful when you have a snippet that you want to format in a specific way, such as wrapping it with a YAML tag format.
 
-##### Execute snippet 
-To inject content of a command, use `action="exec"`. This injection will run the snippet shell command and inject the output.
-Snippet:
-```yaml
-snippets:
-  EXEC:
-    content: echo '1+1'= $((1+1))
-    path: ./snipdoc.yml
-```
+[Check out this example](./docs/template/)
 
-Result:
-```sh
-<!-- <snip id="EXEC" inject_from="yaml" action="exec"> -->
-1+1= 2
+#### Executing Snippet Content
+The `execute` action option allows you to execute a snippet as a shell command and collect the output of the command into a snippet. 
+This is useful when you want to add the result of a `--help `command to your documentation, ensuring that your documentation stays up-to-date with your CLI tool's output, even if it changes.
 
-<!-- </snip> -->
-```
+[Check out this example](./docs/execute_snippet_content/)
 
 
 ### Managing Snippets
@@ -89,28 +59,19 @@ To manage all snippets effectively, run:
 snipdoc show
 ```
 
-For a live example, run:
-```sh
- snipdoc show ./snipdoc/examples/inject
-```
+### Creating a YAML File
 
-### Managing Snippets in YAML
+You can mix snippets from your code with a YAML file configuration. Create an empty snipdoc.yml file by running:
 
-If you prefer managing snippets in a YAML file, follow these steps:
-
-1. Create an empty `snipdoc.yml` file:
+Create an `snipdoc.yml` file by running the command:
    ```sh
    snipdoc create-db --empty
    ```
-2. Add your snippets to `snipdoc.yml`, and use them by injecting from YAML `(inject_from="code")`.
-For a live example, run:
-   ```sh
-   snipdoc run ./snipdoc/examples/inject
-   ```
 
-### Check
 
-Validate that all snippets are valid and match the current injected versions. This is useful for incorporating into CI workflows to ensure documentation accuracy and consistency.
+### Checking Snippets
+
+Validate that all snippets are valid and match the current injected versions. This is useful for CI workflows to ensure documentation accuracy and consistency.
 
 ```sh
 snipdoc check
