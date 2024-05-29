@@ -2,7 +2,7 @@
   <img src="./media/logo.png"/>
   <h1>Snipdoc</h1>
   <h3>Managing documentation that includes code snippets</h3>
-  
+
   [![crate](https://img.shields.io/crates/v/snipdoc.svg)](https://crates.io/crates/snipdoc)
   [![docs](https://docs.rs/snipdoc/badge.svg)](https://docs.rs/snipdoc)
 </div>
@@ -64,7 +64,7 @@ Wrap the snippet content with a custom template use `template` attribute.
 
 
 ##### Execute snippet 
-In case you want to inject content of command you can use `action="exec"`. this injection will run the snippet shell command and inject the output
+To inject content of a command, use `action="exec"`. This injection will run the snippet shell command and inject the output.
 Snippet:
 ```yaml
 snippets:
@@ -73,8 +73,8 @@ snippets:
     path: ./snipdoc.yml
 ```
 
-result:
-```
+Result:
+```sh
 <!-- <snip id="EXEC" inject_from="yaml" action="exec"> -->
 1+1= 2
 
@@ -84,13 +84,12 @@ result:
 
 ### Managing Snippets
 
-To manage all snippets effectively, run the following command:
-
+To manage all snippets effectively, run:
 ```sh
 snipdoc show
 ```
 
-For a live example, run the following command inside your project:
+For a live example, run:
 ```sh
  snipdoc show ./snipdoc/examples/inject
 ```
@@ -99,26 +98,28 @@ For a live example, run the following command inside your project:
 
 If you prefer managing snippets in a YAML file, follow these steps:
 
-1. Run the following command to create an empty `snipdoc.yml` file:
+1. Create an empty `snipdoc.yml` file:
    ```sh
    snipdoc create-db --empty
    ```
-2. Add your snippets to `snipdoc.yml`, and use them by injecting from YAML (`inject_from="code"`). 
-For a live example, run the following command inside your project:
+2. Add your snippets to `snipdoc.yml`, and use them by injecting from YAML `(inject_from="code")`.
+For a live example, run:
    ```sh
    snipdoc run ./snipdoc/examples/inject
    ```
 
 ### Check
 
-validate that all snippets are valid and match the current injected versions. 
-It is useful for incorporating into CI workflows to ensure documentation accuracy and consistency.
+Validate that all snippets are valid and match the current injected versions. This is useful for incorporating into CI workflows to ensure documentation accuracy and consistency.
 
 ```sh
 snipdoc check
 ```
 
 #### Github Action
+To integrate Snipdoc with GitHub Actions, use the following workflow configuration:
+
+
 ```yaml
 name: docs
 
