@@ -1,7 +1,7 @@
 # Execute snippet content
 
 The `execute` action option allows you to execute a snippet as a shell command and collect the output of the command into a snippet. 
-This is useful when you want to add the result of a `--help `command to your documentation, ensuring that your documentation stays up-to-date with your CLI tool's output, even if it changes.
+This is useful when you want to add the result of a `--help` command to your documentation, ensuring that your documentation stays up-to-date with your CLI tool's output, even if it changes.
 
 ## Example
 Let's demonstrate how to use the action="exec" attribute.
