@@ -127,7 +127,6 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          components: rustfmt
       - run: cargo install snipdoc        
       - run: snipdoc check        
 ```
