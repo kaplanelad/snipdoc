@@ -2,11 +2,12 @@
   <img src="./media/logo.png"/>
   <h1>Snipdoc</h1>
   <h3>Managing documentation that includes code snippets</h3>
-
-</div>
-
+  
   [![crate](https://img.shields.io/crates/v/snipdoc.svg)](https://crates.io/crates/snipdoc)
   [![docs](https://docs.rs/snipdoc/badge.svg)](https://docs.rs/snipdoc)
+</div>
+
+
 
 **Snipdoc** is a straightforward tool for managing documentation that includes code snippets.
 It collects snippets from your code or YAML files and injects them into various parts of your documentation, making the documentation process more efficient.
