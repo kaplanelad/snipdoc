@@ -78,7 +78,6 @@ jobs:
         with:
           command: test
           args: --all-features --all
-          SNIPDOC_SKIP_EXEC_COMMANDS=true
 
   test_default_features:
     name: Test Default
