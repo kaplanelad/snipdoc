@@ -51,7 +51,7 @@ jobs:
           command: clippy
           args: --all-features -- -D warnings -W clippy::pedantic -W clippy::nursery -W rust-2018-idioms
 
-  test:
+  test_all_features:
     name: Test All Features
     strategy:
       matrix:
@@ -80,7 +80,7 @@ jobs:
           args: --all-features --all
           SNIPDOC_SKIP_EXEC_COMMANDS=true
 
-  test:
+  test_default_features:
     name: Test Default
     strategy:
       matrix:
