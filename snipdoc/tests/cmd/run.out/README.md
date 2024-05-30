@@ -93,10 +93,3 @@ Expected to inject the content of the snippet with the given template with a dif
     path: main.rs 
  ```
 # </snip> 
-
-
-Execute the snippet with action `exec`
-<!-- <snip id="EXEC" inject_from="yaml" action="exec"> -->
-1+1= 2
-
-<!-- </snip> -->

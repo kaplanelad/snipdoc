@@ -66,9 +66,3 @@ Expected to inject the content of the snippet with the given template with a dif
 # <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```"> 
 
 # </snip> 
-
-
-Execute the snippet with action `exec`
-<!-- <snip id="EXEC" inject_from="yaml" action="exec"> -->
-
-<!-- </snip> -->

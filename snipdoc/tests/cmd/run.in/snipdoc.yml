@@ -3,6 +3,3 @@ snippets:
     content: |-
       Inject from YAML file
     path: main.rs
-  EXEC:
-    content: echo '1+1'= $((1+1))
-    path: main.rs

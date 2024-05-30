@@ -20,7 +20,7 @@ tracing = { version = "0.1.40" }
 tracing-subscriber = { version = "0.3.16", features = [
     "env-filter",
 ], optional = true }
-
+cfg-if = "1.0.0"
 regex = { version = "1.10.3" }
 ignore = { version = "0.4.22" }
 rayon = { version = "1.10.0" }
@@ -28,6 +28,7 @@ thiserror = { version = "1.0.61" }
 serde = { version = "1.0.202", features = ["derive"] }
 serde_yaml = { version = "0.9.33" }
 serde_regex = { version = "1.1.0" }
+requestty = { version = "0.5.0", optional = true }
 
 # Cli
 clap = { version = "4.5.2", features = ["std", "derive"], optional = true }
@@ -38,6 +39,7 @@ console = { version = "0.15.8", optional = true }
 
 [features]
 default = ["cli"]
+exec = ["dep:requestty"]
 
 cli = ["dep:clap", "dep:tracing-subscriber", "reporters"]
 reporters = ["dep:console", "dep:tabled"]

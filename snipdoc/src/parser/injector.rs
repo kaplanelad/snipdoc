@@ -33,6 +33,7 @@ pub struct InjectSummary {
 #[derive(PartialEq, Eq)]
 pub enum InjectAction {
     Copy,
+    #[cfg(feature = "exec")]
     Exec,
 }
 
@@ -42,6 +43,7 @@ impl FromStr for InjectAction {
     fn from_str(input: &str) -> std::result::Result<Self, ()> {
         match input {
             "copy" => Ok(Self::Copy),
+            #[cfg(feature = "exec")]
             "exec" => Ok(Self::Exec),
             _ => Err(()),
         }

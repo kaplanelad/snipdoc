@@ -52,7 +52,36 @@ jobs:
           args: --all-features -- -D warnings -W clippy::pedantic -W clippy::nursery -W rust-2018-idioms
 
   test:
-    name: Test Suite
+    name: Test All Features
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] # , windows-latest
+        rust: [stable]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: ${{ env.TOOLCHAIN_PROFILE }}
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        env:
+          SNIPDOC_SKIP_EXEC_COMMANDS: true
+        with:
+          command: test
+          args: --all-features --all
+          SNIPDOC_SKIP_EXEC_COMMANDS=true
+
+  test:
+    name: Test Default
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest] # , windows-latest
@@ -75,4 +104,3 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --all
