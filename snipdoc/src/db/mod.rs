@@ -89,7 +89,12 @@ impl Snippet {
 
         let content = inject_actions.template.as_ref().map_or_else(
             || content.to_string(),
-            |template| template.replace("{snippet}", &content).replace("\\n", "\n"),
+            |template| {
+                template
+                    .get()
+                    .replace("{snippet}", &content)
+                    .replace("\\n", "\n")
+            },
         );
 
         content
@@ -132,7 +137,7 @@ mod tests {
     use insta::assert_debug_snapshot;
 
     use super::*;
-    use crate::tests_cfg;
+    use crate::{parser::injector::Template, tests_cfg};
 
     #[test]
     fn can_get_snippet_content_without_action() {
@@ -160,7 +165,7 @@ mod tests {
             inject_from: SnippetKind::Any,
             strip_prefix: None,
             add_prefix: None,
-            template: Some("```sh\n{snippet}\n```".to_string()),
+            template: Some(Template::new("```sh\n{snippet}\n```")),
         };
         assert_debug_snapshot!(snippet.get_content(&action));
     }
@@ -205,7 +210,7 @@ mod tests {
             inject_from: SnippetKind::Any,
             strip_prefix: Some("$ ".to_string()),
             add_prefix: Some("- ".to_string()),
-            template: Some("```sh\n{snippet}\n```".to_string()),
+            template: Some(Template::new("```sh\n{snippet}\n```")),
         };
         assert_debug_snapshot!(snippet.get_content(&action));
     }
@@ -221,7 +226,7 @@ mod tests {
             inject_from: SnippetKind::Any,
             strip_prefix: None,
             add_prefix: None,
-            template: Some("```sh\n{snippet}\n```".to_string()),
+            template: Some(Template::new("```sh\n{snippet}\n```")),
         };
         assert_debug_snapshot!(snippet.get_content(&action));
     }

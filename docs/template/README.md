@@ -16,8 +16,21 @@ snippets:
 
 <!-- </snip> -->
 ```
-### Applying a Template:
-To wrap the snippet with a YAML code block, use the `template` attribute like this:
+### Applying a pre defined Template:
+To wrap the snippet with a YAML code block, use the `template` attribute like this and give `yaml` value for getting the following results:
+ 
+<!-- <snip id="example-template" inject_from="code" template="yaml"> -->
+```yaml
+snippets:
+  test:
+    content: test
+    path: main.rs
+
+```
+
+<!-- </snip> -->
+### Applying a Custom Template:
+Adding a custom template should contains any string in the template and for locate the injection add `{snippet}`.
  
 <!-- <snip id="example-template" inject_from="code" template="```yaml\n{snippet}\n```"> -->
 ```yaml

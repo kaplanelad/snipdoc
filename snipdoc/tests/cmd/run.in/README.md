@@ -55,6 +55,12 @@ Expected to inject the content of the snippet with the given template
 
 <!-- </snip> -->
 
+Expected to inject the content of the snippet with the pre-defined template
+<!-- <snip id="config-template" inject_from="code" template="yaml"> -->
+
+<!-- </snip> -->
+
+
 
 Expected to inject the content of the snippet with the given template with a different comment tag
 # <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```"> 
