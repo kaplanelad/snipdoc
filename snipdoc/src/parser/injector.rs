@@ -54,7 +54,63 @@ pub struct InjectContentAction {
     pub inject_from: SnippetKind,
     pub strip_prefix: Option<String>,
     pub add_prefix: Option<String>,
-    pub template: Option<String>,
+    pub template: Option<Template>,
+}
+
+pub enum Template {
+    Text,
+    Json,
+    Yaml,
+    Toml,
+    Html,
+    Rust,
+    Python,
+    Go,
+    Sql,
+    Shell,
+    Bash,
+    Sh,
+    Custom(String),
+}
+
+impl Template {
+    #[must_use]
+    pub fn new(s: &str) -> Self {
+        match s {
+            "text" => Self::Text,
+            "json" => Self::Json,
+            "yaml" => Self::Yaml,
+            "toml" => Self::Toml,
+            "html" => Self::Html,
+            "rust" => Self::Rust,
+            "python" => Self::Python,
+            "go" => Self::Go,
+            "sql" => Self::Sql,
+            "shell" => Self::Shell,
+            "bash" => Self::Bash,
+            "sh" => Self::Sh,
+            _ => Self::Custom(s.to_string()),
+        }
+    }
+
+    #[must_use]
+    pub fn get(&self) -> String {
+        match self {
+            Self::Text => r"```text\n{snippet}\n```".to_string(),
+            Self::Json => r"```json\n{snippet}\n```".to_string(),
+            Self::Yaml => r"```yaml\n{snippet}\n```".to_string(),
+            Self::Toml => r"```toml\n{snippet}\n```".to_string(),
+            Self::Html => r"```html\n{snippet}\n```".to_string(),
+            Self::Rust => r"```rust\n{snippet}\n```".to_string(),
+            Self::Python => r"```python\n{snippet}\n```".to_string(),
+            Self::Go => r"```go\n{snippet}\n```".to_string(),
+            Self::Sql => r"```sql\n{snippet}\n```".to_string(),
+            Self::Shell => r"```shell\n{snippet}\n```".to_string(),
+            Self::Bash => r"```bash\n{snippet}\n```".to_string(),
+            Self::Sh => r"```sh\n{snippet}\n```".to_string(),
+            Self::Custom(template) => template.clone(),
+        }
+    }
 }
 
 impl InjectContentAction {
@@ -85,7 +141,7 @@ impl InjectContentAction {
             inject_from,
             strip_prefix: attributes.get(STRIP_PREFIX_ATTRIBUTE_NAME).cloned(),
             add_prefix: attributes.get(ADD_PREFIX_ATTRIBUTE_NAME).cloned(),
-            template: attributes.get(ADD_TEMPLATE).cloned(),
+            template: attributes.get(ADD_TEMPLATE).map(|s| Template::new(s)),
             kind: attributes
                 .get(INJECT_ACTION)
                 .and_then(|a| InjectAction::from_str(a).ok())
