@@ -1,0 +1,17 @@
+```console
+$ SNIPDOC_SKIP_EXEC_COMMANDS=true snipdoc run
+==============================
+       Snipdoc 
+==============================
+
+Overall Summary:
+Folder                : [CWD]
+
+Detailed Summary by Action Type:
+Equal      : 0
+Injected   : 1
+
+Injected In Files:
+ - README.md
+
+```

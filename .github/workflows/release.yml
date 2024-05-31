@@ -22,22 +22,22 @@ jobs:
         include:
         - build: x86_64-linux
           os: ubuntu-20.04
-          rust: stable
+          rust: ${{ env.RUST_TOOLCHAIN }}
           target: x86_64-unknown-linux-gnu
           cross: false
         - build: x86_64-macos
           os: macos-latest
-          rust: stable
+          rust: ${{ env.RUST_TOOLCHAIN }}
           target: x86_64-apple-darwin
           cross: false
         - build: x86_64-windows
           os: windows-latest
-          rust: stable
+          rust: ${{ env.RUST_TOOLCHAIN }}
           target: x86_64-pc-windows-msvc
           cross: false
         - build: aarch64-macos
           os: macos-latest
-          rust: stable
+          rust: ${{ env.RUST_TOOLCHAIN }}
           target: aarch64-apple-darwin
 
 
@@ -50,17 +50,24 @@ jobs:
       - name: Install ${{ matrix.rust }} toolchain
         uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
+          profile: ${{ env.TOOLCHAIN_PROFILE }}
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           target: ${{ matrix.target }}
           override: true
 
-      - name: Build release binary
+      - name: Build default release binary
         uses: actions-rs/cargo@v1
         with:
           use-cross: ${{ matrix.cross }}
           command: build
           args: --release --locked --target ${{ matrix.target }}
+
+      - name: Build exec feature release binary
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.cross }}
+          command: build
+          args: --release --features exec --locked --target-dir ${{ matrix.target }}/exec-feature
 
       - name: Build archive
         shell: bash
@@ -68,8 +75,10 @@ jobs:
           mkdir dist
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             cp "target/${{ matrix.target }}/release/$BIN_NAME.exe" "dist/"
+            cp "target/${{ matrix.target }}/exec-feature/release/$BIN_NAME.exe" "dist/"
           else
             cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
+            cp "target/${{ matrix.target }}/exec-feature/release/$BIN_NAME" "dist/"
           fi
 
       - uses: actions/upload-artifact@v2.2.4
