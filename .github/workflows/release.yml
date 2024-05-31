@@ -67,7 +67,7 @@ jobs:
         with:
           use-cross: ${{ matrix.cross }}
           command: build
-          args: --release --features exec --locked --target-dir ${{ matrix.target }}/exec-feature
+          args: --release --features exec --locked --target-dir target/${{ matrix.target }}/exec-feature
 
       - name: Build archive
         shell: bash
