@@ -10,6 +10,8 @@ env:
   PROJECT_NAME: snipdoc 
   REPO_NAME: kaplanelad/snipdoc
   BREW_TAP: kaplanelad/homebrew-tap
+  RUST_TOOLCHAIN: stable
+  TOOLCHAIN_PROFILE: minimal
 
 jobs:
   dist:
