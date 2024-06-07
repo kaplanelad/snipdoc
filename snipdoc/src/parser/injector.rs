@@ -515,7 +515,7 @@ not-found
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
 
-        with_settings!({filters => tests_cfg::cleanup::all()}, {
+        with_settings!({filters => tests_cfg::redact::all()}, {
             assert_debug_snapshot!(injector.run(&snippet_refs));
         });
     }

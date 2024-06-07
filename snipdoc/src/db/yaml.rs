@@ -156,7 +156,7 @@ mod tests {
 
         let replace_path = root_folder.display().to_string().replace('\\', r"/");
         with_settings!({filters => {
-            let mut clean = tests_cfg::cleanup::all();
+            let mut clean = tests_cfg::redact::all();
             clean.push((replace_path.as_str(), "[PATH]"));
             clean
         }}, {
