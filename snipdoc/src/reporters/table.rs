@@ -3,10 +3,9 @@ use std::{collections::BTreeMap, path::Path};
 use tabled::{builder::Builder, settings::Style};
 
 use super::ReporterOutput;
-use crate::{
-    db::Snippet,
-    parser::injector::InjectStatus,
-    processor::{InjectContentResult, InjectResults},
+use crate::parser::{
+    injector::{InjectSnippets, InjectStatus, InjectedContent},
+    Snippet,
 };
 
 pub struct Output {}
@@ -42,7 +41,7 @@ impl ReporterOutput for Output {
         println!("{}", builder.build().with(Style::modern()));
     }
 
-    fn inject(&self, root_folder: &Path, result: &InjectResults) {
+    fn inject(&self, root_folder: &Path, result: &InjectSnippets) {
         let mut builder = Builder::default();
         builder.push_record(["Path", "Action", "Snippet ID", ""]);
 
@@ -52,7 +51,7 @@ impl ReporterOutput for Output {
                 .unwrap_or(file);
 
             match status {
-                InjectContentResult::Injected(summary) => {
+                InjectedContent::Injected(summary) => {
                     for action in &summary.actions {
                         match action {
                             InjectStatus::Equal { snippet_id } => {
@@ -88,8 +87,8 @@ impl ReporterOutput for Output {
                         }
                     }
                 }
-                InjectContentResult::None => (),
-                InjectContentResult::Error(error) => {
+                InjectedContent::None => (),
+                InjectedContent::Error(error) => {
                     builder.push_record([
                         format!("{}", path_view.display()),
                         "error".to_string(),

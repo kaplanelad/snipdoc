@@ -1,68 +1,93 @@
+mod actions;
 pub mod collector;
-pub mod html_tag;
+mod html_tag;
 pub mod injector;
 
-use std::collections::HashMap;
+use std::{path::PathBuf, str::FromStr};
 
-use pest::Parser;
-// use pest::{iterators::Pairs, Parser};
 use pest_derive::Parser;
+use serde::{Deserialize, Serialize};
 
-use crate::{db::Snippet, errors::ParserResult};
+#[cfg(feature = "exec")]
+use crate::parser::actions::exec;
 
 #[derive(Parser)]
 #[grammar = "snippet.pest"]
 pub struct SnippetParse;
 
-/// A structure representing a file to be parsed.
-pub struct ParseFile<'a> {
-    pub input: &'a str,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Snippet {
+    pub id: String,
+    pub content: String,
+    pub kind: SnippetKind,
+    pub path: PathBuf,
 }
 
-impl<'a> ParseFile<'a> {
-    /// Constructs a new [`ParseFile`] with the provided input.
+#[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
+#[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub enum SnippetKind {
+    Yaml,
+    Code,
+    #[default]
+    Any,
+}
+
+impl FromStr for SnippetKind {
+    type Err = ();
+
+    fn from_str(input: &str) -> std::result::Result<Self, ()> {
+        match input {
+            "yaml" => Ok(Self::Yaml),
+            "code" => Ok(Self::Code),
+            "any" => Ok(Self::Any),
+            _ => Err(()),
+        }
+    }
+}
+
+impl Snippet {
+    /// Returns the snippet content, filtered based on `strip_prefix` if
+    /// specified.
     #[must_use]
-    pub const fn new(input: &'a str) -> Self {
-        Self { input }
-    }
+    pub fn create_content(&self, inject_actions: &injector::InjectContentAction) -> String {
+        #[cfg(feature = "exec")]
+        let content = if inject_actions.kind == injector::InjectAction::Exec {
+            exec::run(&self.content).unwrap_or_else(|_| self.content.to_string())
+        } else {
+            self.content.to_string()
+        };
 
-    // /// Constructs a new [`ParseFile`] with the provided input.
-    // #[must_use]
-    // pub const fn new(input: &'a str) -> Self {
-    //     Self { input }
-    // }
+        #[cfg(not(feature = "exec"))]
+        let content = self.content.to_string();
 
-    /// Parses the input file content and extracts snippets.
-    ///
-    /// # Errors
-    ///
-    /// This function may return an error if it fails to parse the input file.
-    /// Other errors encountered during parsing will be logged.
-    pub fn parse(&self) -> ParserResult<'_, Vec<collector::CollectSnippet>> {
-        let pairs = SnippetParse::parse(Rule::file, self.input)?;
+        let content = inject_actions
+            .template
+            .before_inject(&content, &inject_actions.kind);
 
-        let mut findings: Vec<collector::CollectSnippet> = vec![];
-        collector::collect_snippets(pairs, &mut findings);
-        Ok(findings)
-    }
+        let content = content
+            .split('\n')
+            .filter_map(|line| {
+                // validate if i can remove this code
+                if line.contains("<snip") || line.contains("</snip") {
+                    return None;
+                }
+                let line = inject_actions.strip_prefix.as_ref().map_or_else(
+                    || line.to_string(),
+                    |prefix_inject| line.strip_prefix(prefix_inject).unwrap_or(line).to_string(),
+                );
 
-    /// Injects snippets in the input file content based on the provided
-    /// [`Snippet`] map.
-    ///
-    /// # Errors
-    ///
-    /// This function may return an error if it fails to parse the input file.
-    /// Other errors encountered during parsing will be logged.
-    pub fn inject(
-        &self,
-        snippets: &HashMap<String, &Snippet>,
-    ) -> ParserResult<'_, injector::InjectSummary> {
-        let pairs = SnippetParse::parse(Rule::file, self.input)?;
+                if let Some(add_prefix) = &inject_actions.add_prefix {
+                    Some(format!("{add_prefix}{line}"))
+                } else {
+                    Some(line)
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
 
-        let mut inject_summary = injector::InjectSummary::default();
-        injector::inject_snippets(pairs, &mut inject_summary, snippets)?;
-
-        Ok(inject_summary)
+        inject_actions
+            .template
+            .after_inject(&content, &inject_actions.kind)
     }
 }
 
@@ -71,111 +96,101 @@ mod tests {
     use insta::assert_debug_snapshot;
 
     use super::*;
-    use crate::tests_cfg;
+    use crate::{
+        parser::injector::{InjectAction, Template},
+        tests_cfg,
+    };
 
     #[test]
-    fn can_collect() {
-        let content = r#"# Snipdoc
-# parse the snippet with `inject_from` attribute
-<!-- <snip id="description" inject_from="code"> -->
-<!-- </snip> -->
+    fn can_get_snippet_content_without_action() {
+        let snippet = tests_cfg::get_snippet();
 
-# parse snippet with html comment
-<!-- <snip id="installation"> -->
-$ cargo install snipdoc
-$ ssnipdoc --version
-<!-- </snip> -->
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Template::default(),
+        };
 
-# parse snippet without any spaces between the comment 
-<!--<snip id="no-spaces">-->
-$ cargo install snipdoc
-$ ssnipdoc --version
-<!--</snip>-->
-
-# parse snippet with double slash comment
-// <snip id="double-slash"> 
-double-slash
-// </snip> 
-
-# parse snippet with triple slash comment
-/// <snip id="triple-slash"> 
-triple-slash
-/// </snip> 
-/// 
-# parse snippet with triple hashtag comment
-# <snip id="hashtag"> 
-hashtag
-# </snip> 
-
-# Inner snippets
-<!-- <snip id="level-1" -->
-Level 1
-// <snip id="level-2"> 
-Level 2
-// <snip id="level-3"> 
-Level 3
-// </snip>
-// </snip>
-<!-- </snip> -->
-"#;
-
-        let parser = ParseFile::new(content);
-        assert_debug_snapshot!(parser.parse());
+        assert_debug_snapshot!(snippet.create_content(&action));
     }
 
     #[test]
-    fn parsing_error() {
-        let content = r#"<!-- <snip id="description"></snip"#;
-        let parser: ParseFile = ParseFile::new(content);
-        assert!(parser.parse().is_err());
+    fn can_get_snippet_content_with_template_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Template::new("```sh\n{snippet}\n```"),
+        };
+        assert_debug_snapshot!(snippet.create_content(&action));
     }
 
     #[test]
-    fn get_inject() {
-        let content = r#"# Snipdoc
+    fn can_get_snippet_content_with_strip_prefix_action() {
+        let snippet = tests_cfg::get_snippet();
 
-<!-- <snip id="installation" inject_from="code"> -->
-# inject `installation` snippet id from code snippet kind
-<!-- </snip> -->
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: Some("$ ".to_string()),
+            add_prefix: None,
+            template: Template::default(),
+        };
+        assert_debug_snapshot!(snippet.create_content(&action));
+    }
 
-<!-- <snip id="inject_from_yaml" inject_from="yaml"> -->
-# inject `inject_from_yaml` snippet id from yaml snippet kind
-<!-- </snip> -->
+    #[test]
+    fn can_get_snippet_content_with_add_prefix_action() {
+        let snippet = tests_cfg::get_snippet();
 
-<!-- <snip id="inject_from_yaml" inject_from="code"> -->
-# Skip injection, `inject_from_yaml` snippet id not exists in code
-<!-- </snip> -->
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: Some("$".to_string()),
+            template: Template::default(),
+        };
+        assert_debug_snapshot!(snippet.create_content(&action));
+    }
 
-<!-- <snip id="inject_from_yaml" inject_from="any"> -->
-# inject_from is any, and this id exists in the yaml
-<!-- </snip> -->
+    #[test]
+    fn can_get_snippet_content_with_combination_action() {
+        let snippet = tests_cfg::get_snippet();
 
-<!-- <snip id="description" inject_from="code" add_prefix="//! "> -->
-# Adding the prefix for each line
-<!-- </snip> -->
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: Some("$ ".to_string()),
+            add_prefix: Some("- ".to_string()),
+            template: Template::new("```sh\n{snippet}\n```"),
+        };
+        assert_debug_snapshot!(snippet.create_content(&action));
+    }
 
-<!-- <snip id="description" inject_from="code" strip_prefix="snip"> -->
-# Strip `snip` word from prefix for each line
-<!-- </snip> -->
+    #[cfg(feature = "exec")]
+    #[test]
+    fn can_get_snippet_with_exec_action_with_template() {
+        let mut snippet = tests_cfg::get_snippet();
+        snippet.content = r"echo calc result: $((1+1))".to_string();
 
-<!-- <snip id="description" inject_from="code" template="```sh\n{snippet}\n```"> -->
-# Add template to inject snippet
-<!-- </snip> -->
-
-<!-- <snip id="description" inject_from="code"> -->
-snipdoc
-<!-- </snip> -->
-
-<!-- <snip id="not-found" inject_from="code"> -->
-not-found
-<!-- </snip> -->
-
-"#;
-        let parser: ParseFile = ParseFile::new(content);
-        let snippets: HashMap<String, Snippet> = tests_cfg::get_snippet_to_inject();
-        let snippet_refs: HashMap<String, &Snippet> =
-            snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
-
-        assert_debug_snapshot!(parser.inject(&snippet_refs));
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Exec,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Template::new("```sh\n{snippet}\n```"),
+        };
+        assert_debug_snapshot!(snippet.create_content(&action));
     }
 }

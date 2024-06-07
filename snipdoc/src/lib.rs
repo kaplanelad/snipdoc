@@ -122,7 +122,7 @@ pub mod config;
 pub mod db;
 pub mod errors;
 pub mod parser;
-pub mod processor;
+mod read_file;
 #[cfg(feature = "reporters")]
 pub mod reporters;
 #[cfg(test)]

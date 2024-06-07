@@ -15,7 +15,10 @@ use snipdoc::{
     cli::CmdExit,
     config::Config,
     db::{self, Db},
-    processor::{Collector, Injector},
+    parser::{
+        collector::Collector,
+        injector::{InjectedContent, Injector, InjectorResult},
+    },
     walk,
 };
 
@@ -43,7 +46,7 @@ pub fn exec(
 
     if !dry_run {
         for (path, status) in injector.results.iter() {
-            if let snipdoc::processor::InjectContentResult::Injected(summary) = status {
+            if let InjectedContent::Injected(summary) = status {
                 write_content(path.as_path(), &summary.content).unwrap();
             }
         }
@@ -58,7 +61,7 @@ pub fn run(
     config: &Config,
     inject_folder: &Path,
     db_file: Option<PathBuf>,
-) -> io::Result<Injector> {
+) -> io::Result<InjectorResult> {
     // first search a snippets from the code
     let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
         Ok(walk) => walk,
@@ -67,7 +70,7 @@ pub fn run(
         }
     };
 
-    let mut snippets = db::Code::new(Collector::on_files(&walk).snippets)
+    let mut snippets = db::Code::new(Collector::walk(&walk).snippets)
         .load()
         .unwrap();
 
@@ -95,7 +98,8 @@ pub fn run(
         }
     };
 
-    Ok(Injector::on_files(&walk, &snippets))
+    let inject_config = config.inject.clone().unwrap_or_default();
+    Ok(Injector::walk(&walk, &snippets, &inject_config))
 }
 
 fn write_content(path: &Path, content: &str) -> std::io::Result<()> {

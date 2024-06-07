@@ -6,11 +6,13 @@ Ok(
     DBData {
         snippets: {
             "description": Snippet {
+                id: "description",
                 content: "test\nsnipdoc",
                 kind: Code,
                 path: "README.md",
             },
             "installation": Snippet {
+                id: "installation",
                 content: "```\ncargo install snipdoc\n```",
                 kind: Code,
                 path: "README.md",

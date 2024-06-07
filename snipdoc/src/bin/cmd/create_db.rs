@@ -24,8 +24,7 @@ use snipdoc::{
     cli::CmdExit,
     config::Config,
     db::{self, Db},
-    parser::collector::CollectSnippet,
-    processor::Collector,
+    parser::collector::{CollectSnippet, Collector},
     walk,
 };
 
@@ -63,7 +62,7 @@ pub fn exec(config: &Config, collect_folder: &Path, empty: bool) -> CmdExit {
             }
         };
 
-        let collector = Collector::on_files(&walk);
+        let collector = Collector::walk(&walk);
 
         let all_snippets: Vec<&snipdoc::parser::collector::CollectSnippet> =
             collector.snippets.values().flatten().collect();

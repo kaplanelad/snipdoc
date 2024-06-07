@@ -1,9 +1,10 @@
 use std::path::PathBuf;
 mod cmd;
 use clap::{ArgAction, Parser, Subcommand};
-use snipdoc::{config::Config, db, reporters};
+use snipdoc::{config::Config, parser::SnippetKind, reporters};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
+
 #[derive(clap::ValueEnum, Default, Clone)]
 pub enum Format {
     Table,
@@ -72,8 +73,8 @@ enum Commands {
     },
     /// Show snippets
     Show {
-        #[arg(long,value_enum, default_value_t = db::SnippetKind::default())]
-        from: db::SnippetKind,
+        #[arg(long,value_enum, default_value_t = SnippetKind::default())]
+        from: SnippetKind,
 
         #[arg(long, default_value = None)]
         db_file: Option<PathBuf>,
