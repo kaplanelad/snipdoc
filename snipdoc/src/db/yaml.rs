@@ -163,7 +163,7 @@ mod tests {
         with_settings!({filters => {
             let mut clean = tests_cfg::redact::all();
             clean.push((replace_path.as_str(), "[PATH]"));
-            clean.push(("C:.*\\", "[PATH]"));
+            clean.push(("C:.*\\\\", "[PATH]"));
             clean
         }}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
