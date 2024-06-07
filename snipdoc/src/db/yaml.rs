@@ -154,7 +154,12 @@ mod tests {
         let snippet_refs: Vec<&CollectSnippet> = snippets.iter().collect();
         assert!(yaml.save(&snippet_refs).is_ok());
 
-        with_settings!({filters => tests_cfg::cleanup::all()}, {
+        let replace_path = root_folder.display().to_string().replace('\\', r"/");
+        with_settings!({filters => {
+            let mut clean = tests_cfg::cleanup::all();
+            clean.push((replace_path.as_str(), "[PATH]"));
+            clean
+        }}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
         });
     }
