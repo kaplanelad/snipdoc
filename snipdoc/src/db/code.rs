@@ -3,8 +3,8 @@
 //! `snipdoc`.
 use std::{collections::BTreeMap, path::PathBuf};
 
-use super::{DBData, Db, Error, Result, Snippet, SnippetKind};
-use crate::parser::collector::CollectSnippet;
+use super::{DBData, Db, Error, Result, Snippet};
+use crate::parser::{collector::CollectSnippet, SnippetKind};
 
 pub struct Code {
     pub snippets: BTreeMap<PathBuf, Vec<CollectSnippet>>,
@@ -29,6 +29,7 @@ impl Db for Code {
                     data.snippets.insert(
                         snippet.id.clone(),
                         Snippet {
+                            id: snippet.id.clone(),
                             content: snippet.snippet.join("\n"),
                             kind: SnippetKind::Code,
                             path: path.clone(),

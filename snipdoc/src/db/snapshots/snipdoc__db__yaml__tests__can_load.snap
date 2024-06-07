@@ -6,11 +6,13 @@ Ok(
     DBData {
         snippets: {
             "one": Snippet {
+                id: "one",
                 content: "  THIS SNIPPET FROM YAML FILE\n  <!-- </snip> -->",
                 kind: Yaml,
                 path: "./snipdoc-snippets.yaml",
             },
             "two": Snippet {
+                id: "two",
                 content: "two",
                 kind: Yaml,
                 path: "./snipdoc-snippets.yaml",

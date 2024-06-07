@@ -6,9 +6,9 @@ use std::{
 use console::style;
 
 use super::ReporterOutput;
-use crate::{
-    db::Snippet,
-    processor::{InjectResults, InjectStats},
+use crate::parser::{
+    injector::{InjectSnippets, InjectStats},
+    Snippet,
 };
 
 pub struct Output {}
@@ -37,7 +37,7 @@ impl ReporterOutput for Output {
         }
     }
 
-    fn inject(&self, root_folder: &Path, result: &InjectResults) {
+    fn inject(&self, root_folder: &Path, result: &InjectSnippets) {
         let stats = result.stats();
 
         println!("==============================");

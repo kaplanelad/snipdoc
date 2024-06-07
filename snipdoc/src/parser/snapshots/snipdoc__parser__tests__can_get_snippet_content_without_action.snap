@@ -1,0 +1,5 @@
+---
+source: snipdoc/src/parser/mod.rs
+expression: snippet.get_content(&action)
+---
+"$ cargo install snipdoc\n$ snipdoc --version"

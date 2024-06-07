@@ -1,6 +1,6 @@
 ---
-source: snipdoc/src/parser/mod.rs
-expression: parser.parse()
+source: snipdoc/src/parser/collector.rs
+expression: collector.run()
 ---
 Ok(
     [
@@ -36,8 +36,8 @@ Ok(
         CollectSnippet {
             id: "double-slash",
             inject_from: None,
-            tag_open: "<snip id=\"double-slash\"> ",
-            tag_close: "// </snip> ",
+            tag_open: "<snip id=\"double-slash\">\n",
+            tag_close: "// </snip>\n",
             snippet: [
                 "double-slash",
             ],
@@ -45,17 +45,18 @@ Ok(
         CollectSnippet {
             id: "triple-slash",
             inject_from: None,
-            tag_open: "<snip id=\"triple-slash\"> ",
-            tag_close: "// </snip> ",
+            tag_open: "<snip id=\"triple-slash\">\n",
+            tag_close: "// </snip>\n//",
             snippet: [
                 "triple-slash",
+                "/// </snip>",
             ],
         },
         CollectSnippet {
             id: "hashtag",
             inject_from: None,
-            tag_open: "<snip id=\"hashtag\"> ",
-            tag_close: "# </snip> ",
+            tag_open: "<snip id=\"hashtag\">\n",
+            tag_close: "# </snip>\n",
             snippet: [
                 "hashtag",
             ],
@@ -67,9 +68,9 @@ Ok(
             tag_close: "</snip> -->\n",
             snippet: [
                 "Level 1",
-                "// <snip id=\"level-2\"> ",
+                "// <snip id=\"level-2\">",
                 "Level 2",
-                "// <snip id=\"level-3\"> ",
+                "// <snip id=\"level-3\">",
                 "Level 3",
                 "// </snip>",
                 "// </snip>",
@@ -79,11 +80,11 @@ Ok(
         CollectSnippet {
             id: "level-2",
             inject_from: None,
-            tag_open: "<snip id=\"level-2\"> ",
+            tag_open: "<snip id=\"level-2\">\n",
             tag_close: "</snip>\n<!-- ",
             snippet: [
                 "Level 2",
-                "// <snip id=\"level-3\"> ",
+                "// <snip id=\"level-3\">",
                 "Level 3",
                 "// </snip>",
                 "// </snip>",
@@ -92,7 +93,7 @@ Ok(
         CollectSnippet {
             id: "level-3",
             inject_from: None,
-            tag_open: "<snip id=\"level-3\"> ",
+            tag_open: "<snip id=\"level-3\">\n",
             tag_close: "// </snip>\n// ",
             snippet: [
                 "Level 3",

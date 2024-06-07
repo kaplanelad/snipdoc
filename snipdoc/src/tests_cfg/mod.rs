@@ -1,9 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use crate::{
-    db::{Snippet, SnippetKind},
-    parser::collector::CollectSnippet,
-};
+use crate::parser::{collector::CollectSnippet, Snippet, SnippetKind};
 
 #[must_use]
 pub fn get_collect_snippets() -> Vec<CollectSnippet> {
@@ -39,6 +36,7 @@ pub fn get_collect_snippets() -> Vec<CollectSnippet> {
 #[must_use]
 pub fn get_snippet() -> Snippet {
     Snippet {
+        id: "test".to_string(),
         content: "$ cargo install snipdoc\n$ snipdoc --version".to_string(),
         kind: SnippetKind::Code,
         path: PathBuf::from("main.rs"),
@@ -51,6 +49,7 @@ pub fn get_snippet_to_inject() -> HashMap<String, Snippet> {
         (
             "description".to_string(),
             Snippet {
+                id: "test".to_string(),
                 content: "snipdoc".to_string(),
                 kind: SnippetKind::Code,
                 path: PathBuf::from("main.rs"),
@@ -59,6 +58,7 @@ pub fn get_snippet_to_inject() -> HashMap<String, Snippet> {
         (
             "installation".to_string(),
             Snippet {
+                id: "test".to_string(),
                 content: "$ cargo install snipdoc\n$ snipdoc --version".to_string(),
                 kind: SnippetKind::Code,
                 path: PathBuf::from("main.rs"),
@@ -67,6 +67,7 @@ pub fn get_snippet_to_inject() -> HashMap<String, Snippet> {
         (
             "inject_from_yaml".to_string(),
             Snippet {
+                id: "test".to_string(),
                 content: "inject_from_yaml".to_string(),
                 kind: SnippetKind::Yaml,
                 path: PathBuf::from("main.rs"),

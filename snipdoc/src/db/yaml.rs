@@ -8,8 +8,8 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use super::{DBData, Db, Result, Snippet, SnippetKind};
-use crate::parser::collector::CollectSnippet;
+use super::{DBData, Db, Result, Snippet};
+use crate::parser::{collector::CollectSnippet, SnippetKind};
 
 pub const DEFAULT_FILE_NAME: &str = "snipdoc.yml";
 
@@ -61,6 +61,7 @@ impl Db for Yaml {
             data.snippets.insert(
                 id.clone(),
                 Snippet {
+                    id: id.clone(),
                     content: snippet.content.clone(),
                     kind: SnippetKind::Yaml,
                     path: snippet.path.clone(),

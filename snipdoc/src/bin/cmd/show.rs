@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use snipdoc::{
     cli::CmdExit,
     config::Config,
-    db::{self, DBData, Db, SnippetKind},
-    processor::Collector,
+    db::{self, DBData, Db},
+    parser::{collector::Collector, SnippetKind},
     walk,
 };
 
@@ -36,7 +36,7 @@ pub fn exec(
     let mut snippets_data = DBData::default();
 
     if snippet_kind == &SnippetKind::Code || snippet_kind == &SnippetKind::Any {
-        let code_snippets = db::Code::new(Collector::on_files(&walk).snippets)
+        let code_snippets = db::Code::new(Collector::walk(&walk).snippets)
             .load()
             .unwrap();
 
