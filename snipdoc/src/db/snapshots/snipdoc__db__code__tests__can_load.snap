@@ -7,13 +7,13 @@ Ok(
         snippets: {
             "description": Snippet {
                 id: "description",
-                content: "test\nsnipdoc",
+                content: "test[NEW_LINE]snipdoc",
                 kind: Code,
                 path: "README.md",
             },
             "installation": Snippet {
                 id: "installation",
-                content: "```\ncargo install snipdoc\n```",
+                content: "```[NEW_LINE]cargo install snipdoc[NEW_LINE]```",
                 kind: Code,
                 path: "README.md",
             },

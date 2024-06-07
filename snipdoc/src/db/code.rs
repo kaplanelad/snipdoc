@@ -48,7 +48,7 @@ impl Db for Code {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::tests_cfg;
@@ -62,7 +62,9 @@ mod tests {
             )]),
         };
 
+        with_settings!({filters => tests_cfg::redact::all()}, {
         assert_debug_snapshot!(code.load());
+        });
     }
 
     #[test]
