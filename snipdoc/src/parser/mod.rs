@@ -191,6 +191,6 @@ mod tests {
             add_prefix: None,
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action, &InjectConfig::default()));
+        assert_debug_snapshot!(snippet.create_content(&action));
     }
 }
