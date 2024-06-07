@@ -93,7 +93,7 @@ impl Snippet {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::{
@@ -114,7 +114,11 @@ mod tests {
             template: Template::default(),
         };
 
-        assert_debug_snapshot!(snippet.create_content(&action));
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -129,7 +133,12 @@ mod tests {
             add_prefix: None,
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -144,7 +153,12 @@ mod tests {
             add_prefix: None,
             template: Template::default(),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -159,7 +173,12 @@ mod tests {
             add_prefix: Some("$".to_string()),
             template: Template::default(),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -174,7 +193,12 @@ mod tests {
             add_prefix: Some("- ".to_string()),
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[cfg(feature = "exec")]
@@ -191,6 +215,11 @@ mod tests {
             add_prefix: None,
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => vec![
+            (crate::LINE_ENDING, "\n")
+        ]}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 }
