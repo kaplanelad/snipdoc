@@ -374,6 +374,7 @@ impl<'a> Injector<'a> {
     /// indicates a severe problem that requires immediate attention.
     /// In testing scenarios, this panic should be captured to ensure the
     /// correctness of the parser.
+    #[allow(clippy::only_used_in_recursion)]
     fn inject_snippets<S: BuildHasher>(
         &self,
         pairs: Pairs<'a, Rule>,
