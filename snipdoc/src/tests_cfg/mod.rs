@@ -2,6 +2,12 @@ use std::{collections::HashMap, path::PathBuf};
 
 use crate::parser::{collector::CollectSnippet, Snippet, SnippetKind};
 
+#[cfg(windows)]
+pub const REGEX_REPLACE_LINE_ENDING: &str = "\\r\\n";
+
+#[cfg(not(windows))]
+pub const REGEX_REPLACE_LINE_ENDING: &str = "\n";
+
 #[must_use]
 pub fn get_collect_snippets() -> Vec<CollectSnippet> {
     vec![

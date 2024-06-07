@@ -63,7 +63,7 @@ mod tests {
         };
 
         with_settings!({filters => vec![
-            (crate::LINE_ENDING, "\n")
+            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "\n")
         ]}, {
             assert_debug_snapshot!(code.load());
         });
@@ -84,7 +84,7 @@ mod tests {
         };
 
         with_settings!({filters => vec![
-            (crate::LINE_ENDING, "\n")
+            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "\n")
         ]}, {
             assert!(code.save(&[&save_snippets]).is_err());
         });
