@@ -118,6 +118,7 @@
 
 #[cfg(feature = "cli")]
 pub mod cli;
+pub mod config;
 pub mod db;
 pub mod errors;
 pub mod parser;
@@ -127,4 +128,3 @@ pub mod reporters;
 #[cfg(test)]
 pub mod tests_cfg;
 pub mod walk;
-pub mod config;
