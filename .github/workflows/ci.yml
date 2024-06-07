@@ -55,7 +55,7 @@ jobs:
     name: Test All Features
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # , windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest] # , windows-latest
         rust: [stable]
     runs-on: ${{ matrix.os }}
     steps:
@@ -83,7 +83,7 @@ jobs:
     name: Test Default
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # , windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest] # , windows-latest
         rust: [stable]
     runs-on: ${{ matrix.os }}
     steps:
