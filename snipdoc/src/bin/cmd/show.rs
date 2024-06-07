@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use snipdoc::{
     cli::CmdExit,
+    config::Config,
     db::{self, DBData, Db, SnippetKind},
     processor::Collector,
     walk,
@@ -18,13 +19,14 @@ use crate::Format;
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
 pub fn exec(
+    config: &Config,
     inject_folder: &Path,
     snippet_kind: &SnippetKind,
     db_file: Option<PathBuf>,
     format: &Format,
 ) -> CmdExit {
     // collect first snippets from code
-    let walk = match walk::Walk::new(inject_folder) {
+    let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
         Ok(walk) => walk,
         Err(err) => {
             return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));

@@ -4,7 +4,7 @@
 
 use std::path::{Path, PathBuf};
 
-use snipdoc::cli::CmdExit;
+use snipdoc::{cli::CmdExit, config::Config};
 
 use super::{super::Format, run::run};
 
@@ -14,8 +14,8 @@ use super::{super::Format, run::run};
 ///
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
-pub fn exec(inject_folder: &Path, db_file: Option<PathBuf>) -> CmdExit {
-    let injector = match run(inject_folder, db_file) {
+pub fn exec(config: &Config, inject_folder: &Path, db_file: Option<PathBuf>) -> CmdExit {
+    let injector = match run(config, inject_folder, db_file) {
         Ok(i) => i,
         Err(err) => {
             return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));

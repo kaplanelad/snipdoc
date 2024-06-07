@@ -1,4 +1,3 @@
-includes:
-excludes:
-- examples/ignore-.*
-exclude_file_path:
+walk:
+  excludes:
+  - examples/ignore-.*

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 mod cmd;
 use clap::{ArgAction, Parser, Subcommand};
-use snipdoc::{db, reporters};
+use snipdoc::{config::Config, db, reporters};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 #[derive(clap::ValueEnum, Default, Clone)]
@@ -36,6 +36,10 @@ struct Cli {
     /// Source code directory for collecting documentation
     #[clap(global = true, index = 1, default_value = ".")]
     path: PathBuf,
+
+    /// Application config. by default will search `./snipdoc-config.yml`
+    #[arg(global = true, short, long, value_enum)]
+    config: Option<PathBuf>,
 
     #[command(subcommand)]
     command: Commands,
@@ -96,19 +100,31 @@ fn main() {
     let span = tracing::span!(tracing::Level::INFO, "cli");
     let _guard = span.enter();
 
+    let config = if let Some(config) = app.config {
+        match Config::from_file(&config) {
+            Ok(config) => config,
+            Err(err) => {
+                tracing::error!(err = %err, "could not load configuration file");
+                std::process::exit(1);
+            }
+        }
+    } else {
+        Config::try_from_default_file(app.path.as_path())
+    };
+
     match app.command {
-        Commands::CreateDb { empty } => cmd::create_db::exec(app.path.as_path(), empty),
-        Commands::Check { db_file } => cmd::check::exec(app.path.as_path(), db_file),
+        Commands::CreateDb { empty } => cmd::create_db::exec(&config, app.path.as_path(), empty),
+        Commands::Check { db_file } => cmd::check::exec(&config, app.path.as_path(), db_file),
         Commands::Run {
             db_file,
             dry_run,
             format,
-        } => cmd::run::exec(app.path.as_path(), db_file, dry_run, &format),
+        } => cmd::run::exec(&config, app.path.as_path(), db_file, dry_run, &format),
         Commands::Show {
             from,
             db_file,
             format,
-        } => cmd::show::exec(app.path.as_path(), &from, db_file, &format),
+        } => cmd::show::exec(&config, app.path.as_path(), &from, db_file, &format),
     }
     .exit();
 }

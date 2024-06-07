@@ -22,6 +22,7 @@ use std::path::Path;
 
 use snipdoc::{
     cli::CmdExit,
+    config::Config,
     db::{self, Db},
     parser::collector::CollectSnippet,
     processor::Collector,
@@ -34,7 +35,7 @@ use snipdoc::{
 ///
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
-pub fn exec(collect_folder: &Path, empty: bool) -> CmdExit {
+pub fn exec(config: &Config, collect_folder: &Path, empty: bool) -> CmdExit {
     let span = tracing::span!(tracing::Level::INFO, "collect", empty);
     let _guard = span.enter();
 
@@ -53,7 +54,7 @@ pub fn exec(collect_folder: &Path, empty: bool) -> CmdExit {
 
         db::Yaml::new(&db_file_path).save(&example_snippet_refs)
     } else {
-        let walk = match walk::Walk::new(collect_folder) {
+        let walk = match walk::Walk::from_config(collect_folder, &config.walk) {
             Ok(walk) => walk,
             Err(err) => {
                 return CmdExit::error_with_message(&format!(
