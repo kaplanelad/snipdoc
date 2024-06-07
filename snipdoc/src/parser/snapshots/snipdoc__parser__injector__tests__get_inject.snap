@@ -4,11 +4,11 @@ expression: injector.run(&snippet_refs)
 ---
 Ok(
     InjectSummary {
-        content: "# Snipdoc\n\n<!-- <snip id=\"installation\" inject_from=\"code\"> -->\n$ cargo install snipdoc\n$ snipdoc --version\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"yaml\"> -->\ninject_from_yaml\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"code\"> -->\n# Skip injection, `inject_from_yaml` snippet id not exists in code\n<!-- </snip> -->\n\n<!-- <snip id=\"inject_from_yaml\" inject_from=\"any\"> -->\ninject_from_yaml\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\" add_prefix=\"//! \"> -->\n//! snipdoc\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\" strip_prefix=\"snip\"> -->\ndoc\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\"\ntemplate=\"```sh\\n{snippet}\\n```\"> --> ```sh\nsnipdoc\n```\n<!-- </snip> -->\n\n<!-- <snip id=\"description\" inject_from=\"code\"> -->\nsnipdoc\n<!-- </snip> -->\n\n<!-- <snip id=\"not-found\" inject_from=\"code\"> -->\nnot-found\n<!-- </snip> -->\n\n",
+        content: "# Snipdoc[NEW_LINE][NEW_LINE]<!-- <snip id=\"installation\" inject_from=\"code\"> -->[NEW_LINE]$ cargo install snipdoc[NEW_LINE]$ snipdoc --version[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"inject_from_yaml\" inject_from=\"yaml\"> -->[NEW_LINE]inject_from_yaml[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"inject_from_yaml\" inject_from=\"code\"> -->[NEW_LINE]# Skip injection, `inject_from_yaml` snippet id not exists in code[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"inject_from_yaml\" inject_from=\"any\"> -->[NEW_LINE]inject_from_yaml[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"description\" inject_from=\"code\" add_prefix=\"//! \"> -->[NEW_LINE]//! snipdoc[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"description\" inject_from=\"code\" strip_prefix=\"snip\"> -->[NEW_LINE]doc[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"description\" inject_from=\"code\"[NEW_LINE]template=\"```sh\[NEW_LINE]{snippet}\[NEW_LINE]```\"> --> ```sh[NEW_LINE]snipdoc[NEW_LINE]```[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"description\" inject_from=\"code\"> -->[NEW_LINE]snipdoc[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]<!-- <snip id=\"not-found\" inject_from=\"code\"> -->[NEW_LINE]not-found[NEW_LINE]<!-- </snip> -->[NEW_LINE][NEW_LINE]",
         actions: [
             Injected {
                 snippet_id: "installation",
-                content: "$ cargo install snipdoc\n$ snipdoc --version",
+                content: "$ cargo install snipdoc[NEW_LINE]$ snipdoc --version",
             },
             Injected {
                 snippet_id: "inject_from_yaml",
@@ -28,7 +28,7 @@ Ok(
             },
             Injected {
                 snippet_id: "description",
-                content: "```sh\nsnipdoc\n```",
+                content: "```sh[NEW_LINE]snipdoc[NEW_LINE]```",
             },
             Equal {
                 snippet_id: "description",
