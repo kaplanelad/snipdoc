@@ -114,9 +114,7 @@ mod tests {
             template: Template::default(),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
@@ -134,9 +132,7 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
@@ -154,9 +150,7 @@ mod tests {
             template: Template::default(),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
@@ -174,9 +168,7 @@ mod tests {
             template: Template::default(),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
@@ -194,9 +186,7 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
@@ -216,9 +206,7 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }

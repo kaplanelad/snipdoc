@@ -48,7 +48,7 @@ impl Db for Code {
 
 #[cfg(test)]
 mod tests {
-    use insta::{assert_debug_snapshot, with_settings};
+    use insta::assert_debug_snapshot;
 
     use super::*;
     use crate::tests_cfg;
@@ -62,11 +62,7 @@ mod tests {
             )]),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
-            assert_debug_snapshot!(code.load());
-        });
+        assert_debug_snapshot!(code.load());
     }
 
     #[test]
@@ -83,10 +79,6 @@ mod tests {
             tag_close: "<!-- </snip> -->\n".to_string(),
         };
 
-        with_settings!({filters => vec![
-            (tests_cfg::REGEX_REPLACE_LINE_ENDING, "[NEW_LINE]")
-        ]}, {
-            assert!(code.save(&[&save_snippets]).is_err());
-        });
+        assert!(code.save(&[&save_snippets]).is_err());
     }
 }
