@@ -462,7 +462,7 @@ impl<'a> Injector<'a> {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::tests_cfg;
@@ -515,6 +515,8 @@ not-found
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
 
-        assert_debug_snapshot!(injector.run(&snippet_refs));
+        with_settings!({filters => tests_cfg::cleanup::all()}, {
+            assert_debug_snapshot!(injector.run(&snippet_refs));
+        });
     }
 }
