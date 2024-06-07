@@ -13,6 +13,7 @@ use std::{
 
 use snipdoc::{
     cli::CmdExit,
+    config::Config,
     db::{self, Db},
     processor::{Collector, Injector},
     walk,
@@ -27,12 +28,13 @@ use crate::Format;
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
 pub fn exec(
+    config: &Config,
     inject_folder: &Path,
     db_file: Option<PathBuf>,
     dry_run: bool,
     format: &Format,
 ) -> CmdExit {
-    let injector = match run(inject_folder, db_file) {
+    let injector = match run(config, inject_folder, db_file) {
         Ok(i) => i,
         Err(err) => {
             return CmdExit::error_with_message(&format!("could not init walk instance: {err}"));
@@ -52,9 +54,13 @@ pub fn exec(
     CmdExit::ok()
 }
 
-pub fn run(inject_folder: &Path, db_file: Option<PathBuf>) -> io::Result<Injector> {
+pub fn run(
+    config: &Config,
+    inject_folder: &Path,
+    db_file: Option<PathBuf>,
+) -> io::Result<Injector> {
     // first search a snippets from the code
-    let walk = match walk::Walk::new(inject_folder) {
+    let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
         Ok(walk) => walk,
         Err(err) => {
             return Err(err);
@@ -82,15 +88,7 @@ pub fn run(inject_folder: &Path, db_file: Option<PathBuf>) -> io::Result<Injecto
         snippets.snippets.extend(snippets_from_yaml.snippets);
     }
 
-    let config = {
-        let mut config = walk::Config::try_from_default_file(inject_folder);
-        if let Some(snipdocs_file) = maybe_yaml_file {
-            config.excludes_file_path.push(snipdocs_file.path);
-        }
-        config
-    };
-
-    let walk = match walk::Walk::from_config(inject_folder, &config) {
+    let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
         Ok(walk) => walk,
         Err(err) => {
             return Err(err);

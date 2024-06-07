@@ -127,3 +127,4 @@ pub mod reporters;
 #[cfg(test)]
 pub mod tests_cfg;
 pub mod walk;
+pub mod config;

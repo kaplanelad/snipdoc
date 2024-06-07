@@ -10,10 +10,8 @@ use std::{
 };
 
 use ignore::WalkBuilder;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
 
-use crate::errors::ConfigResult;
+use crate::config::WalkConfig;
 
 pub const DEFAULT_CONFIG_NAME: &str = "snipdoc-config.yml";
 
@@ -22,55 +20,7 @@ pub const DEFAULT_CONFIG_NAME: &str = "snipdoc-config.yml";
 pub struct Walk {
     /// The base folder from which files are collected.
     pub folder: PathBuf,
-    config: Config,
-}
-
-/// Configuration for file inclusion and exclusion patterns.
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Config {
-    /// Patterns to include files.
-    #[serde(with = "serde_regex", default)]
-    pub includes: Vec<Regex>,
-    /// Patterns to exclude files.
-    #[serde(with = "serde_regex", default)]
-    pub excludes: Vec<Regex>,
-    /// Patterns to exclude files.
-    #[serde(default)]
-    pub excludes_file_path: Vec<PathBuf>,
-}
-
-impl Config {
-    /// Search if [`DEFAULT_CONFIG_NAME`] configuration file exists under the
-    /// given path. if exists, loading the configuration from the config
-    /// file. if not load the default
-    pub fn try_from_default_file(path: &Path) -> Self {
-        let maybe_config_exists = path.join(DEFAULT_CONFIG_NAME);
-
-        if maybe_config_exists.exists() {
-            if let Ok(config) = Self::from_file(maybe_config_exists.as_path()) {
-                return config;
-            }
-            tracing::error!(
-                config = %maybe_config_exists.display(),
-                "invalid config file content"
-            );
-        } else {
-            tracing::debug!(
-                config = %maybe_config_exists.display(),
-                "default config file not found"
-            );
-        }
-        Self::default()
-    }
-
-    /// Convert config file to [`Config`]
-    ///
-    /// # Errors
-    ///
-    /// invalid schema
-    pub fn from_file(path: &Path) -> ConfigResult<'_, Self> {
-        Ok(serde_yaml::from_reader(std::fs::File::open(path)?)?)
-    }
+    config: WalkConfig,
 }
 
 impl Walk {
@@ -82,7 +32,7 @@ impl Walk {
     pub fn new(folder: &Path) -> io::Result<Self> {
         Ok(Self {
             folder: folder.canonicalize()?,
-            config: Config::try_from_default_file(folder),
+            config: WalkConfig::default(),
         })
     }
 
@@ -91,7 +41,7 @@ impl Walk {
     /// # Errors
     ///
     /// Returns an error if the provided folder path is invalid.
-    pub fn from_config(folder: &Path, config: &Config) -> io::Result<Self> {
+    pub fn from_config(folder: &Path, config: &WalkConfig) -> io::Result<Self> {
         Ok(Self {
             folder: folder.canonicalize()?,
             config: config.clone(),
