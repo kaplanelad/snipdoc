@@ -82,7 +82,7 @@ impl Db for Yaml {
                 data.snippets.insert(
                     snippet.id.to_string(),
                     YamlSnippet {
-                        content: snippet.snippet.join("\n"),
+                        content: snippet.snippet.join(crate::LINE_ENDING),
                         path: self.path.clone(),
                     },
                 );
@@ -154,8 +154,14 @@ mod tests {
         let snippet_refs: Vec<&CollectSnippet> = snippets.iter().collect();
         assert!(yaml.save(&snippet_refs).is_ok());
 
+        #[cfg(windows)]
+        let replace_path = root_folder.display().to_string().replace(r"\", r"\\");
+
+        #[cfg(not(windows))]
+        let replace_path = root_folder.display().to_string();
+
         with_settings!({filters => vec![
-            (root_folder.display().to_string().as_str(), "[PATH]")
+            (replace_path.as_str(), "[PATH]")
         ]}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
         });

@@ -65,7 +65,7 @@ impl Snippet {
             .before_inject(&content, &inject_actions.kind);
 
         let content = content
-            .split('\n')
+            .lines()
             .filter_map(|line| {
                 // validate if i can remove this code
                 if line.contains("<snip") || line.contains("</snip") {
@@ -83,7 +83,7 @@ impl Snippet {
                 }
             })
             .collect::<Vec<_>>()
-            .join("\n");
+            .join(crate::LINE_ENDING);
 
         inject_actions
             .template

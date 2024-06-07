@@ -143,7 +143,7 @@ impl<'a> Collector<'a> {
 
                     let mut lines = pair
                         .as_str()
-                        .split('\n')
+                        .lines()
                         .map(std::string::ToString::to_string)
                         .skip(1)
                         .collect::<Vec<_>>();

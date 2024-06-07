@@ -30,7 +30,7 @@ impl Db for Code {
                         snippet.id.clone(),
                         Snippet {
                             id: snippet.id.clone(),
-                            content: snippet.snippet.join("\n"),
+                            content: snippet.snippet.join(crate::LINE_ENDING),
                             kind: SnippetKind::Code,
                             path: path.clone(),
                         },
