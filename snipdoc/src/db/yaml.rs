@@ -161,9 +161,8 @@ mod tests {
         let replace_path = root_folder.display().to_string();
 
         with_settings!({filters => {
-            let mut clean = tests_cfg::redact::all();
-            clean.push((replace_path.as_str(), "[PATH]"));
-            clean
+            // let mut clean = tests_cfg::redact::all();
+           vec![(replace_path.as_str(), "[PATH]")]
         }}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
         });
