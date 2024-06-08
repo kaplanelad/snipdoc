@@ -155,7 +155,7 @@ mod tests {
         assert!(yaml.save(&snippet_refs).is_ok());
 
         #[cfg(windows)]
-        let replace_path = root_folder.display().to_string().replace(r"\", r"\\");
+        let replace_path = "C:.*\\";
 
         #[cfg(not(windows))]
         let replace_path = root_folder.display().to_string();
