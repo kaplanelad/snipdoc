@@ -509,9 +509,14 @@ not-found
 
 "#;
 
+        // let content = if cfg!(windows) {
+        //     content.replace('\n', crate::LINE_ENDING)
+        // } else {
+        //     content.to_string()
+        // };
         let inject_config = InjectConfig::default();
         let base_inject_path = PathBuf::from(".");
-        let injector = Injector::new(base_inject_path.as_path(), &content, &inject_config);
+        let injector = Injector::new(base_inject_path.as_path(), content, &inject_config);
         let snippets: HashMap<String, Snippet> = tests_cfg::get_snippet_to_inject();
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
