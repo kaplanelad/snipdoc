@@ -195,7 +195,7 @@ mod tests {
     #[test]
     fn can_get_snippet_with_exec_action_with_template() {
         let mut snippet = tests_cfg::get_snippet();
-        snippet.content = r"echo calc result: $((1+1))".to_string();
+        snippet.content = r#"echo "snipdoc""#.to_string();
 
         let action = injector::InjectContentAction {
             kind: InjectAction::Exec,
