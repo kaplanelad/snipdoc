@@ -31,7 +31,7 @@ impl Walk {
     /// Returns an error if the provided folder path is invalid.
     pub fn new(folder: &Path) -> io::Result<Self> {
         Ok(Self {
-            folder: folder.canonicalize()?,
+            folder: dunce::canonicalize(folder)?,
             config: WalkConfig::default(),
         })
     }
@@ -43,7 +43,7 @@ impl Walk {
     /// Returns an error if the provided folder path is invalid.
     pub fn from_config(folder: &Path, config: &WalkConfig) -> io::Result<Self> {
         Ok(Self {
-            folder: folder.canonicalize()?,
+            folder: dunce::canonicalize(folder)?,
             config: config.clone(),
         })
     }
@@ -92,7 +92,7 @@ impl Walk {
     fn exclude_file_path(&self, path: &Path) -> bool {
         for exclude_file in &self.config.excludes_file_path {
             let absolute_path =
-                std::fs::canonicalize(exclude_file).unwrap_or_else(|_| exclude_file.clone());
+                dunce::canonicalize(exclude_file).unwrap_or_else(|_| exclude_file.clone());
             if absolute_path == path {
                 tracing::debug!("file should not be included");
                 return true;

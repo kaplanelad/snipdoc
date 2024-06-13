@@ -20,7 +20,7 @@ impl ReporterOutput for Output {
         println!("Found {} snippets", snippets.len());
         let mut count = 1;
         for (id, snippet) in snippets {
-            let path_view = std::fs::canonicalize(root_folder)
+            let path_view = dunce::canonicalize(root_folder)
                 .map(|absolute_path| {
                     snippet
                         .path
@@ -46,7 +46,7 @@ impl ReporterOutput for Output {
         builder.push_record(["Path", "Action", "Snippet ID", ""]);
 
         for (file, status) in result.iter() {
-            let path_view = std::fs::canonicalize(root_folder)
+            let path_view = dunce::canonicalize(root_folder)
                 .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
                 .unwrap_or(file);
 

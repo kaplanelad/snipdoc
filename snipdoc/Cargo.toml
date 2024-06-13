@@ -29,6 +29,7 @@ serde = { version = "1.0.202", features = ["derive"] }
 serde_yaml = { version = "0.9.33" }
 serde_regex = { version = "1.1.0" }
 requestty = { version = "0.5.0", optional = true }
+dunce = "1.0.4"
 
 # Cli
 clap = { version = "4.5.2", features = ["std", "derive"], optional = true }
