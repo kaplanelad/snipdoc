@@ -160,11 +160,12 @@ mod tests {
         #[cfg(not(windows))]
         let replace_path = root_folder.display().to_string();
 
-        with_settings!({filters => {
-            // let mut clean = tests_cfg::redact::all();
-           vec![(replace_path.as_str(), "[PATH]")]
-        }}, {
-            assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
-        });
+        // with_settings!({filters => {
+        //     // let mut clean = tests_cfg::redact::all();
+        //    vec![(replace_path.as_str(), "[PATH]")]
+        // }}, {
+        //     assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
+        // });
+        assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
     }
 }

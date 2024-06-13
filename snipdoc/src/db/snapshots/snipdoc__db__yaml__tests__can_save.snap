@@ -3,5 +3,5 @@ source: snipdoc/src/db/yaml.rs
 expression: "std::fs::read_to_string(db_file_path)"
 ---
 Ok(
-    "snippets:\n  description:\n    content: |-\n      test\n      snipdoc\n    path: [PATH]/snipdoc.yml\n  installation:\n    content: |-\n      ```\n      cargo install snipdoc\n      ```\n    path: [PATH]/snipdoc.yml\n",
+    "snippets:\n  description:\n    content: |-\n      test\n      snipdoc\n    path: /var/folders/wc/t5blxghs1b5d75ygrgzcsb3w0000gn/T/EMvcw/snipdoc.yml\n  installation:\n    content: |-\n      ```\n      cargo install snipdoc\n      ```\n    path: /var/folders/wc/t5blxghs1b5d75ygrgzcsb3w0000gn/T/EMvcw/snipdoc.yml\n",
 )
