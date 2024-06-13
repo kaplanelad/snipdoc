@@ -473,16 +473,14 @@ impl<'a> Injector<'a> {
     }
 }
 
+#[cfg(not(windows))]
 #[cfg(test)]
 mod tests {
-    #[cfg(not(windows))]
     use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
-    #[cfg(not(windows))]
     use crate::tests_cfg;
 
-    #[cfg(not(windows))]
     #[test]
     fn get_inject() {
         let content = r#"# Snipdoc
