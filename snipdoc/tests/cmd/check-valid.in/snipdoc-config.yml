@@ -1,5 +1,5 @@
 walk:
   includes:
   excludes:
-  - examples/ignore-.*
+  - examples[/|\\]ignore-.*
   exclude_file_path:

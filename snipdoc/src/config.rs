@@ -52,7 +52,7 @@ impl Config {
 
         if maybe_config_exists.exists() {
             if let Ok(config) = Self::from_file(maybe_config_exists.as_path()) {
-                tracing::error!(
+                tracing::debug!(
                     config = %maybe_config_exists.display(),
                     "configuration file loaded"
                 );
