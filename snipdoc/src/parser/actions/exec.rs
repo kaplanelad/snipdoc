@@ -2,7 +2,7 @@ use std::{env, process::Command};
 
 pub fn run(command: &str) -> Result<String, String> {
     if approve_exec_command(command) {
-        tracing::debug!(command, "execute snippet  content");
+        tracing::debug!(command, "execute snippet content");
 
         let res = if cfg!(target_os = "windows") {
             Command::new("cmd").arg("/C").arg(command).output()
@@ -12,7 +12,11 @@ pub fn run(command: &str) -> Result<String, String> {
 
         match res {
             Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).to_string()),
-            Err(e) => Err(e.to_string()),
+            Err(err) => {
+                tracing::debug!(command, err = %err, "execute snippet command failed");
+
+                Err(err.to_string())
+            }
         }
     } else {
         Err("command not approved".to_string())

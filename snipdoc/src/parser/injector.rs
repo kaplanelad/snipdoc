@@ -475,9 +475,8 @@ impl<'a> Injector<'a> {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
     #[cfg(not(windows))]
-    use insta::with_settings;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     #[cfg(not(windows))]
