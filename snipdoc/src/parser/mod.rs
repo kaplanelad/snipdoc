@@ -195,7 +195,7 @@ mod tests {
     #[test]
     fn can_get_snippet_with_exec_action_with_template() {
         let mut snippet = tests_cfg::get_snippet();
-        snippet.content = r"cargo run -- --version".to_string();
+        snippet.content = r"echo calc result: $((1+1))".to_string();
 
         let action = injector::InjectContentAction {
             kind: InjectAction::Exec,
@@ -206,11 +206,7 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        with_settings!({filters => {
-            let mut redact = tests_cfg::redact::all();
-            redact.push((env!("CARGO_PKG_VERSION"), "[VERSION]" ));
-            redact
-        }}, {
+        with_settings!({filters => tests_cfg::redact::all()}, {
             assert_debug_snapshot!(snippet.create_content(&action));
         });
     }
