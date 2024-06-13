@@ -1,4 +1,4 @@
 snippets:
   EXEC:
-    content: snipdoc --version
+    content: echo '1+1'= $((1+1))
     path: main.rs
