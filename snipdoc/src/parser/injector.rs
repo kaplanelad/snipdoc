@@ -6,8 +6,10 @@ use std::{
     str::FromStr,
 };
 
+use lazy_static::lazy_static;
 use pest::{iterators::Pairs, Parser};
 use rayon::prelude::*;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use super::{html_tag, Rule};
@@ -20,6 +22,10 @@ use crate::{
     walk::Walk,
     LINE_ENDING,
 };
+
+lazy_static! {
+    static ref RE_NORMALIZE_TEXT: Regex = Regex::new(r"[\s\r\n]+").unwrap();
+}
 
 const INJECT_ACTION: &str = "action";
 const INJECT_FROM_ATTRIBUTE_NAME: &str = "inject_from";
@@ -425,12 +431,7 @@ impl<'a> Injector<'a> {
 
                             summary.content.write_str(&inject_result)?;
 
-                            println!("==================");
-                            println!("{}", pair.as_str());
-                            println!("=");
-                            println!("{inject_result}");
-                            println!("result = {}", pair.as_str() == inject_result);
-                            if pair.as_str() == inject_result {
+                            if Self::is_str_equal(pair.as_str(), &inject_result) {
                                 summary.actions.push(InjectStatus::Equal {
                                     snippet_id: inject_actions.snippet_id.to_string(),
                                 });
@@ -465,6 +466,10 @@ impl<'a> Injector<'a> {
             }
         }
         Ok(())
+    }
+
+    fn is_str_equal(a: &str, b: &str) -> bool {
+        RE_NORMALIZE_TEXT.replace_all(a, "") == RE_NORMALIZE_TEXT.replace_all(b, "")
     }
 }
 

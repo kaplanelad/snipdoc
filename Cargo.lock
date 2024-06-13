@@ -1314,6 +1314,7 @@ dependencies = [
  "dunce",
  "ignore",
  "insta",
+ "lazy_static",
  "pest",
  "pest_derive",
  "rayon",
