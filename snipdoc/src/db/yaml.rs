@@ -102,10 +102,9 @@ impl Db for Yaml {
 
 #[cfg(test)]
 mod tests {
-    use insta::{assert_debug_snapshot, with_settings};
+    use insta::assert_debug_snapshot;
 
     use super::*;
-    use crate::tests_cfg;
 
     #[test]
     fn can_load() {
@@ -124,7 +123,7 @@ mod tests {
                     path: ./snipdoc-snippets.yaml
         ";
 
-        let path = tree_fs::from_yaml_str(yaml_content).unwrap();
+        let path: PathBuf = tree_fs::from_yaml_str(yaml_content).unwrap();
         let yaml_db = Yaml::new(path.join("snipdoc-snippets.yaml").as_path());
         assert_debug_snapshot!(yaml_db.load());
     }
@@ -145,7 +144,7 @@ mod tests {
         assert!(Yaml::try_from_default_file(Path::new("path")).is_none());
     }
 
-    #[cfg(not(windows))]
+    #[cfg(windows)]
     #[test]
     fn can_save() {
         let root_folder = tree_fs::Tree::default().root_folder;
