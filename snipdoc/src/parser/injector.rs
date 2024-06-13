@@ -18,6 +18,7 @@ use crate::{
     parser::{Snippet, SnippetKind, SnippetParse},
     read_file::RFile,
     walk::Walk,
+    LINE_ENDING,
 };
 
 const INJECT_ACTION: &str = "action";
@@ -416,7 +417,7 @@ impl<'a> Injector<'a> {
                                 html_tag::get_comment_tag_of_tag_open(&children);
 
                             let inject_result = format!(
-                                "{comment_tag}{tag_open}{}{snippet_content}\n{tag_close}",
+                                "{comment_tag}{tag_open}{}{snippet_content}{LINE_ENDING}{tag_close}",
                                 close_tag_of_tag_open.unwrap_or_default()
                             );
 
@@ -516,20 +517,20 @@ not-found
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
 
-        #[cfg(not(windows))]
-        let redact = tests_cfg::redact::all();
-        #[cfg(windows)]
-        let redact = {
-            let mut redact = vec![
-                // (r"\\n\\n", tests_cfg::redact::REDACT_NEW_LINE),
-                (
-                    tests_cfg::redact::REGEX_REPLACE_LINE_ENDING,
-                    tests_cfg::redact::REDACT_NEW_LINE,
-                ),
-            ];
-            redact
-        };
-        with_settings!({filters => redact}, {
+        // #[cfg(not(windows))]
+        // let redact = tests_cfg::redact::all();
+        // #[cfg(windows)]
+        // let redact = {
+        //     let mut redact = vec![
+        //         // (r"\\n\\n", tests_cfg::redact::REDACT_NEW_LINE),
+        //         (
+        //             tests_cfg::redact::REGEX_REPLACE_LINE_ENDING,
+        //             tests_cfg::redact::REDACT_NEW_LINE,
+        //         ),
+        //     ];
+        //     redact
+        // };
+        with_settings!({filters => tests_cfg::redact::all()}, {
             assert_debug_snapshot!(injector.run(&snippet_refs));
         });
     }
