@@ -65,7 +65,7 @@ impl Snippet {
             .before_inject(&content, &inject_actions.kind);
 
         let content = content
-            .split('\n')
+            .lines()
             .filter_map(|line| {
                 // validate if i can remove this code
                 if line.contains("<snip") || line.contains("</snip") {
@@ -83,7 +83,7 @@ impl Snippet {
                 }
             })
             .collect::<Vec<_>>()
-            .join("\n");
+            .join(crate::LINE_ENDING);
 
         inject_actions
             .template
@@ -93,7 +93,7 @@ impl Snippet {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::{
@@ -114,7 +114,9 @@ mod tests {
             template: Template::default(),
         };
 
-        assert_debug_snapshot!(snippet.create_content(&action));
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -129,7 +131,10 @@ mod tests {
             add_prefix: None,
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -144,7 +149,10 @@ mod tests {
             add_prefix: None,
             template: Template::default(),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -159,7 +167,10 @@ mod tests {
             add_prefix: Some("$".to_string()),
             template: Template::default(),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[test]
@@ -174,7 +185,10 @@ mod tests {
             add_prefix: Some("- ".to_string()),
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 
     #[cfg(feature = "exec")]
@@ -191,6 +205,9 @@ mod tests {
             add_prefix: None,
             template: Template::new("```sh\n{snippet}\n```"),
         };
-        assert_debug_snapshot!(snippet.create_content(&action));
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action));
+        });
     }
 }

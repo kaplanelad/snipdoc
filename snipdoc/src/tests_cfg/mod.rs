@@ -1,5 +1,5 @@
 use std::{collections::HashMap, path::PathBuf};
-
+pub mod redact;
 use crate::parser::{collector::CollectSnippet, Snippet, SnippetKind};
 
 #[must_use]

@@ -116,6 +116,12 @@
 //!       - run: snipdoc check        
 //! ```
 
+#[cfg(windows)]
+const LINE_ENDING: &str = "\r\n";
+
+#[cfg(not(windows))]
+const LINE_ENDING: &str = "\n";
+
 #[cfg(feature = "cli")]
 pub mod cli;
 pub mod config;

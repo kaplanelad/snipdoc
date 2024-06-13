@@ -18,6 +18,7 @@ use crate::{
     parser::{Snippet, SnippetKind, SnippetParse},
     read_file::RFile,
     walk::Walk,
+    LINE_ENDING,
 };
 
 const INJECT_ACTION: &str = "action";
@@ -112,7 +113,9 @@ impl Template {
 
                     Self::Custom(template) => template.clone(),
                 };
-                template.replace("{snippet}", content).replace("\\n", "\n")
+                template
+                    .replace("{snippet}", content)
+                    .replace("\\n", LINE_ENDING)
             }
             #[cfg(feature = "exec")]
             InjectAction::Exec => content.to_string(),
@@ -416,7 +419,7 @@ impl<'a> Injector<'a> {
                                 html_tag::get_comment_tag_of_tag_open(&children);
 
                             let inject_result = format!(
-                                "{comment_tag}{tag_open}{}{snippet_content}\n{tag_close}",
+                                "{comment_tag}{tag_open}{}{snippet_content}{LINE_ENDING}{tag_close}",
                                 close_tag_of_tag_open.unwrap_or_default()
                             );
 
@@ -462,11 +465,12 @@ impl<'a> Injector<'a> {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::tests_cfg;
 
+    #[cfg(not(windows))]
     #[test]
     fn get_inject() {
         let content = r#"# Snipdoc
@@ -508,6 +512,7 @@ not-found
 <!-- </snip> -->
 
 "#;
+
         let inject_config = InjectConfig::default();
         let base_inject_path = PathBuf::from(".");
         let injector = Injector::new(base_inject_path.as_path(), content, &inject_config);
@@ -515,6 +520,8 @@ not-found
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
 
-        assert_debug_snapshot!(injector.run(&snippet_refs));
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(injector.run(&snippet_refs));
+        });
     }
 }

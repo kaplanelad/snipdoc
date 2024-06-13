@@ -47,8 +47,8 @@ impl ReporterOutput for Output {
         println!("{}", style("Overall Summary:").bold());
         println!(
             "Folder                : {}",
-            std::fs::canonicalize(root_folder)
-                .unwrap_or_else(|_| root_folder.to_path_buf())
+            dunce::canonicalize(root_folder)
+                .unwrap_or_else(|_| { root_folder.to_path_buf() })
                 .display()
         );
         println!();
@@ -113,7 +113,7 @@ impl Output {
         println!();
         println!("{}", style("Found errors in the following files:").bold());
         for (file, error_msg) in errors {
-            let path_view = std::fs::canonicalize(root_folder)
+            let path_view = dunce::canonicalize(root_folder)
                 .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
                 .unwrap_or(file);
 
@@ -125,7 +125,7 @@ impl Output {
         println!();
         println!("{title}");
         for file in inject_files {
-            let path_view = std::fs::canonicalize(root_folder)
+            let path_view = dunce::canonicalize(root_folder)
                 .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
                 .unwrap_or(file);
             println!(" - {}", path_view.display());
@@ -143,7 +143,7 @@ impl Output {
         entries.sort_by(|(file1, _), (file2, _)| file1.cmp(file2));
 
         for (file, snippet_ids) in entries {
-            let path_view = std::fs::canonicalize(root_folder)
+            let path_view = dunce::canonicalize(root_folder)
                 .map(|absolute_path| file.strip_prefix(absolute_path).unwrap_or(file))
                 .unwrap_or(file);
 

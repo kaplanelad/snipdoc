@@ -89,7 +89,7 @@ Options:
 $ snipdoc show --help
 Show snippets
 
-Usage: snipdoc show [OPTIONS] [PATH]
+Usage: snipdoc[EXE] show [OPTIONS] [PATH]
 
 Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]

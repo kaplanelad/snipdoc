@@ -1,5 +1,5 @@
 ---
 source: snipdoc/src/parser/mod.rs
-expression: snippet.get_content(&action)
+expression: snippet.create_content(&action)
 ---
-"- ```sh\n- cargo install snipdoc\n- snipdoc --version\n- ```"
+"- ```sh[NEW_LINE]- cargo install snipdoc[NEW_LINE]- snipdoc --version[NEW_LINE]- ```"

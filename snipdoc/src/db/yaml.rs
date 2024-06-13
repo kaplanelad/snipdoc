@@ -82,7 +82,7 @@ impl Db for Yaml {
                 data.snippets.insert(
                     snippet.id.to_string(),
                     YamlSnippet {
-                        content: snippet.snippet.join("\n"),
+                        content: snippet.snippet.join(crate::LINE_ENDING),
                         path: self.path.clone(),
                     },
                 );
@@ -145,6 +145,7 @@ mod tests {
         assert!(Yaml::try_from_default_file(Path::new("path")).is_none());
     }
 
+    #[cfg(not(windows))]
     #[test]
     fn can_save() {
         let root_folder = tree_fs::Tree::default().root_folder;
@@ -153,10 +154,9 @@ mod tests {
         let snippets = tests_cfg::get_collect_snippets();
         let snippet_refs: Vec<&CollectSnippet> = snippets.iter().collect();
         assert!(yaml.save(&snippet_refs).is_ok());
-
-        with_settings!({filters => vec![
-            (root_folder.display().to_string().as_str(), "[PATH]")
-        ]}, {
+        with_settings!({filters => {
+           vec![(root_folder.display().to_string().as_str(), "[PATH]")]
+        }}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
         });
     }

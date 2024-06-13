@@ -30,7 +30,7 @@ impl Db for Code {
                         snippet.id.clone(),
                         Snippet {
                             id: snippet.id.clone(),
-                            content: snippet.snippet.join("\n"),
+                            content: snippet.snippet.join(crate::LINE_ENDING),
                             kind: SnippetKind::Code,
                             path: path.clone(),
                         },
@@ -48,7 +48,7 @@ impl Db for Code {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
     use crate::tests_cfg;
@@ -62,7 +62,9 @@ mod tests {
             )]),
         };
 
+        with_settings!({filters => tests_cfg::redact::all()}, {
         assert_debug_snapshot!(code.load());
+        });
     }
 
     #[test]
@@ -78,6 +80,7 @@ mod tests {
             tag_open: "<snip id=\"description\">".to_string(),
             tag_close: "<!-- </snip> -->\n".to_string(),
         };
+
         assert!(code.save(&[&save_snippets]).is_err());
     }
 }
