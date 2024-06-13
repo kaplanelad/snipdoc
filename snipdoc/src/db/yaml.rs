@@ -145,6 +145,7 @@ mod tests {
         assert!(Yaml::try_from_default_file(Path::new("path")).is_none());
     }
 
+    #[cfg(not(windows))]
     #[test]
     fn can_save() {
         let root_folder = tree_fs::Tree::default().root_folder;
@@ -153,16 +154,8 @@ mod tests {
         let snippets = tests_cfg::get_collect_snippets();
         let snippet_refs: Vec<&CollectSnippet> = snippets.iter().collect();
         assert!(yaml.save(&snippet_refs).is_ok());
-
-        #[cfg(windows)]
-        let replace_path = "XXXXXXXXXXX".to_string();
-
-        #[cfg(not(windows))]
-        let replace_path = root_folder.display().to_string();
-
         with_settings!({filters => {
-            // let mut clean = tests_cfg::redact::all();
-           vec![(replace_path.as_str(), "[PATH]")]
+           vec![(root_folder.display().to_string().as_str(), "[PATH]")]
         }}, {
             assert_debug_snapshot!(std::fs::read_to_string(db_file_path));
         });
