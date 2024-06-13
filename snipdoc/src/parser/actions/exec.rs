@@ -3,7 +3,14 @@ use std::{env, process::Command};
 pub fn run(command: &str) -> Result<String, String> {
     if approve_exec_command(command) {
         tracing::debug!(command, "execute snippet  content");
-        match Command::new("sh").arg("-c").arg(command).output() {
+
+        let res = if cfg!(target_os = "windows") {
+            Command::new("cmd").arg("/C").arg(command).output()
+        } else {
+            Command::new("sh").arg("-c").arg(command).output()
+        };
+
+        match res {
             Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).to_string()),
             Err(e) => Err(e.to_string()),
         }

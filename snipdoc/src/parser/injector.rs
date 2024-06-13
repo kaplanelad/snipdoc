@@ -425,11 +425,11 @@ impl<'a> Injector<'a> {
 
                             summary.content.write_str(&inject_result)?;
 
-                            println!("==================");
-                            println!("{}", pair.as_str());
-                            println!("=");
-                            println!("{inject_result}");
-                            println!("result = {}", pair.as_str() == inject_result);
+                            // println!("==================");
+                            // println!("{}", pair.as_str());
+                            // println!("=");
+                            // println!("{inject_result}");
+                            // println!("result = {}", pair.as_str() == inject_result);
                             if pair.as_str() == inject_result {
                                 summary.actions.push(InjectStatus::Equal {
                                     snippet_id: inject_actions.snippet_id.to_string(),
