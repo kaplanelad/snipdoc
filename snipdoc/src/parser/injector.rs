@@ -469,60 +469,58 @@ mod tests {
 
     #[test]
     fn get_inject() {
-        let yaml_content = r#"
-        files:
-        - path: content.txt
-          content: | 
-            # Snipdoc
+        let content = r#"# Snipdoc
 
-            <!-- <snip id="installation" inject_from="code"> -->
-            # inject `installation` snippet id from code snippet kind
-            <!-- </snip> -->
+<!-- <snip id="installation" inject_from="code"> -->
+# inject `installation` snippet id from code snippet kind
+<!-- </snip> -->
 
-            <!-- <snip id="inject_from_yaml" inject_from="yaml"> -->
-            # inject `inject_from_yaml` snippet id from yaml snippet kind
-            <!-- </snip> -->
+<!-- <snip id="inject_from_yaml" inject_from="yaml"> -->
+# inject `inject_from_yaml` snippet id from yaml snippet kind
+<!-- </snip> -->
 
-            <!-- <snip id="inject_from_yaml" inject_from="code"> -->
-            # Skip injection, `inject_from_yaml` snippet id not exists in code
-            <!-- </snip> -->
+<!-- <snip id="inject_from_yaml" inject_from="code"> -->
+# Skip injection, `inject_from_yaml` snippet id not exists in code
+<!-- </snip> -->
 
-            <!-- <snip id="inject_from_yaml" inject_from="any"> -->
-            # inject_from is any, and this id exists in the yaml
-            <!-- </snip> -->
+<!-- <snip id="inject_from_yaml" inject_from="any"> -->
+# inject_from is any, and this id exists in the yaml
+<!-- </snip> -->
 
-            <!-- <snip id="description" inject_from="code" add_prefix="//! "> -->
-            # Adding the prefix for each line
-            <!-- </snip> -->
+<!-- <snip id="description" inject_from="code" add_prefix="//! "> -->
+# Adding the prefix for each line
+<!-- </snip> -->
 
-            <!-- <snip id="description" inject_from="code" strip_prefix="snip"> -->
-            # Strip `snip` word from prefix for each line
-            <!-- </snip> -->
+<!-- <snip id="description" inject_from="code" strip_prefix="snip"> -->
+# Strip `snip` word from prefix for each line
+<!-- </snip> -->
 
-            <!-- <snip id="description" inject_from="code"
-            template="```sh\n{snippet}\n```"> --> # Add template to inject snippet
-            <!-- </snip> -->
+<!-- <snip id="description" inject_from="code"
+template="```sh\n{snippet}\n```"> --> # Add template to inject snippet
+<!-- </snip> -->
 
-            <!-- <snip id="description" inject_from="code"> -->
-            snipdoc
-            <!-- </snip> -->
+<!-- <snip id="description" inject_from="code"> -->
+snipdoc
+<!-- </snip> -->
 
-            <!-- <snip id="not-found" inject_from="code"> -->
-            not-found
-            <!-- </snip> -->
-            
-        "#;
+<!-- <snip id="not-found" inject_from="code"> -->
+not-found
+<!-- </snip> -->
 
-        let path: PathBuf = tree_fs::from_yaml_str(yaml_content).unwrap();
-        let content = std::fs::read_to_string(path.join("content.txt")).unwrap();
+"#;
+
         let inject_config = InjectConfig::default();
         let base_inject_path = PathBuf::from(".");
-        let injector = Injector::new(base_inject_path.as_path(), &content, &inject_config);
+        let injector = Injector::new(base_inject_path.as_path(), content, &inject_config);
         let snippets: HashMap<String, Snippet> = tests_cfg::get_snippet_to_inject();
         let snippet_refs: HashMap<String, &Snippet> =
             snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
 
-        with_settings!({filters => tests_cfg::redact::all()}, {
+        // #[cfg(not(windows))]
+        // let redact = tests_cfg::redact::all();
+        // #[cfg(windows)]
+        let redact = vec![(r"\\n", tests_cfg::redact::REDACT_NEW_LINE)];
+        with_settings!({filters => redact}, {
             assert_debug_snapshot!(injector.run(&snippet_refs));
         });
     }
