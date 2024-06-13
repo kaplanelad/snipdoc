@@ -521,7 +521,7 @@ not-found
         #[cfg(windows)]
         let redact = {
             let mut redact = vec![
-                (r"\\n\\n", tests_cfg::redact::REDACT_NEW_LINE),
+                // (r"\\n\\n", tests_cfg::redact::REDACT_NEW_LINE),
                 (
                     tests_cfg::redact::REGEX_REPLACE_LINE_ENDING,
                     tests_cfg::redact::REDACT_NEW_LINE,
