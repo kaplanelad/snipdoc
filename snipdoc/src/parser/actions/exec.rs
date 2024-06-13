@@ -5,18 +5,22 @@ pub fn run(command: &str) -> Result<String, String> {
         tracing::debug!(command, "execute snippet content");
 
         let res = if cfg!(target_os = "windows") {
-            Command::new("cmd").arg("/C").arg(command).output()
+            Command::new("cmd")
+                .args(["/C", command])
+                .output()
+                .map_err(|err| err.to_string())?
         } else {
-            Command::new("sh").arg("-c").arg(command).output()
+            Command::new("sh")
+                .args(["-c", command])
+                .output()
+                .map_err(|err| err.to_string())?
         };
 
-        match res {
-            Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).to_string()),
-            Err(err) => {
-                tracing::error!(command, err = %err, "execute snippet command failed");
-
-                Err(err.to_string())
-            }
+        if res.status.success() {
+            Ok(String::from_utf8_lossy(&res.stdout).to_string())
+        } else {
+            let err_msg = String::from_utf8_lossy(&res.stderr).to_string();
+            Err(err_msg)
         }
     } else {
         Err("command not approved".to_string())

@@ -2,4 +2,4 @@
 source: snipdoc/src/parser/mod.rs
 expression: snippet.create_content(&action)
 ---
-"snipdoc"
+"calc result: 2"

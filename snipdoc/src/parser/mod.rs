@@ -52,7 +52,10 @@ impl Snippet {
     pub fn create_content(&self, inject_actions: &injector::InjectContentAction) -> String {
         #[cfg(feature = "exec")]
         let content = if inject_actions.kind == injector::InjectAction::Exec {
-            exec::run(&self.content).unwrap_or_else(|_| self.content.to_string())
+            exec::run(&self.content).unwrap_or_else(|err| {
+                tracing::error!(err, "execute snippet command failed");
+                self.content.to_string()
+            })
         } else {
             self.content.to_string()
         };
@@ -195,7 +198,7 @@ mod tests {
     #[test]
     fn can_get_snippet_with_exec_action_with_template() {
         let mut snippet = tests_cfg::get_snippet();
-        snippet.content = r#"echo "snipdoc""#.to_string();
+        snippet.content = r"echo calc result: $((1+1))".to_string();
 
         let action = injector::InjectContentAction {
             kind: InjectAction::Exec,
