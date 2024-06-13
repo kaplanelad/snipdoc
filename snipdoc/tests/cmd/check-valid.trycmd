@@ -1,4 +1,4 @@
 ```console
-$ snipdoc check
+$ snipdoc check --log-level debug
 
 ```
