@@ -113,7 +113,9 @@ impl Template {
 
                     Self::Custom(template) => template.clone(),
                 };
-                template.replace("{snippet}", content).replace("\\n", "\n")
+                template
+                    .replace("{snippet}", content)
+                    .replace("\\n", LINE_ENDING)
             }
             #[cfg(feature = "exec")]
             InjectAction::Exec => content.to_string(),
