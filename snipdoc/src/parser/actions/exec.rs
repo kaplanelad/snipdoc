@@ -13,7 +13,7 @@ pub fn run(command: &str) -> Result<String, String> {
         match res {
             Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).to_string()),
             Err(err) => {
-                tracing::debug!(command, err = %err, "execute snippet command failed");
+                tracing::error!(command, err = %err, "execute snippet command failed");
 
                 Err(err.to_string())
             }
