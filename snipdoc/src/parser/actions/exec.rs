@@ -5,8 +5,8 @@ pub fn run(command: &str) -> Result<String, String> {
         tracing::debug!(command, "execute snippet content");
 
         let res = if cfg!(target_os = "windows") {
-            Command::new("cmd")
-                .args(["/C", command])
+            Command::new("powershell")
+                .args(["-Command", command])
                 .output()
                 .map_err(|err| err.to_string())?
         } else {
