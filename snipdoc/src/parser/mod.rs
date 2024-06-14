@@ -209,8 +209,6 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
-        });
+        assert_debug_snapshot!(snippet.create_content(&action));
     }
 }
