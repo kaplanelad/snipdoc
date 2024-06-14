@@ -124,7 +124,7 @@ impl Walk {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, with_settings};
     use regex::Regex;
 
     use super::*;
@@ -169,6 +169,10 @@ mod tests {
                 .cmp(&b.to_string_lossy().to_lowercase())
         });
 
-        assert_debug_snapshot!(file_paths);
+        with_settings!({filters => {
+            vec![("\\\\", "/")]
+         }}, {
+            assert_debug_snapshot!(file_paths);
+        });
     }
 }
