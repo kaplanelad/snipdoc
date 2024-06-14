@@ -170,7 +170,7 @@ mod tests {
         });
 
         with_settings!({filters => {
-            vec![("\\\\", "/")]
+            vec![("\\", "/")]
          }}, {
             assert_debug_snapshot!(file_paths);
         });
