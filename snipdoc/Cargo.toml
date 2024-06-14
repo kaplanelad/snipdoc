@@ -54,3 +54,4 @@ required-features = ["cli"]
 insta = { version = "1.36.1", features = ["redactions", "filters"] }
 tree-fs = { version = "0.1.0" }
 trycmd = "0.15.0"
+rstest = "0.21.0"

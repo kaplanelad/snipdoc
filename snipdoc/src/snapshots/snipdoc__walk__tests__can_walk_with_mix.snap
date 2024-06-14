@@ -3,7 +3,5 @@ source: snipdoc/src/walk.rs
 expression: file_paths
 ---
 [
-    "file.txt",
     "folder/file.txt",
-    "README.md",
 ]

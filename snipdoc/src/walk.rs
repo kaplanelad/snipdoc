@@ -126,11 +126,24 @@ impl Walk {
 mod tests {
     use insta::{assert_debug_snapshot, with_settings};
     use regex::Regex;
+    use rstest::rstest;
 
     use super::*;
 
-    #[test]
-    fn can_exclude_files() {
+    #[rstest]
+    #[case("with_excludes", WalkConfig {
+            includes: vec![],
+            excludes: vec![Regex::new(r"ignores[/|\\]").unwrap()],
+        })]
+    #[case("with_includes", WalkConfig {
+            includes: vec![Regex::new(r"folder[/|\\]").unwrap()],
+            excludes: vec![],
+        })]
+    #[case("with_mix", WalkConfig {
+            includes: vec![Regex::new(r"folder[/|\\]").unwrap()],
+            excludes: vec![Regex::new(r"folder[/|\\]folder").unwrap()],
+        })]
+    fn can_exclude_files(#[case] test_name: &str, #[case] config: WalkConfig) {
         let yaml_content = r"
         files:
         - path: README.md
@@ -139,16 +152,14 @@ mod tests {
           content: 
         - path: folder/file.txt
           content: 
+        - path: folder/folder/2.txt
+          content: 
         - path: ignores/ignore.json
           content: 
         ";
 
         let root_path = tree_fs::from_yaml_str(yaml_content).unwrap();
 
-        let config = WalkConfig {
-            includes: vec![],
-            excludes: vec![Regex::new(r"ignores[/|\\]").unwrap()],
-        };
         let walk = Walk::from_config(&root_path, &config).unwrap();
 
         let files: Vec<PathBuf> = walk.get_files();
@@ -172,7 +183,7 @@ mod tests {
         with_settings!({filters => {
             vec![("\\\\\\\\", "/")]
          }}, {
-            assert_debug_snapshot!(file_paths);
+            assert_debug_snapshot!(format!("can_walk_{test_name}"),file_paths);
         });
     }
 }
