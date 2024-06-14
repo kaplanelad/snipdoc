@@ -194,7 +194,7 @@ mod tests {
         });
     }
 
-    #[cfg(feature = "exec")]
+    #[cfg(all(feature = "exec", not(target_os = "windows")))]
     #[test]
     fn can_get_snippet_with_exec_action_with_template() {
         let mut snippet = tests_cfg::get_snippet();
@@ -209,6 +209,30 @@ mod tests {
             template: Template::new("```sh\n{snippet}\n```"),
         };
 
-        assert_debug_snapshot!(snippet.create_content(&action));
+        assert_debug_snapshot!(
+            "unix_can_get_snippet_with_exec_action_with_template",
+            snippet.create_content(&action)
+        );
+    }
+
+    #[cfg(all(feature = "exec", target_os = "windows"))]
+    #[test]
+    fn can_get_snippet_with_exec_action_with_template() {
+        let mut snippet = tests_cfg::get_snippet();
+        snippet.content = r"echo calc result: $((1+1))".to_string();
+
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Exec,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Template::new("```sh\n{snippet}\n```"),
+        };
+
+        assert_debug_snapshot!(
+            "windows_can_get_snippet_with_exec_action_with_template",
+            snippet.create_content(&action)
+        );
     }
 }
