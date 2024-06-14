@@ -1,7 +1,7 @@
 //! This module provides configuration management for the `snipdoc`. It
 //! includes functionality to load and manage configurations from a default YAML
 //! file.
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -29,9 +29,6 @@ pub struct WalkConfig {
     /// Patterns to exclude files.
     #[serde(with = "serde_regex", default)]
     pub excludes: Vec<Regex>,
-    /// Patterns to exclude files.
-    #[serde(default)]
-    pub excludes_file_path: Vec<PathBuf>,
 }
 
 impl Config {
@@ -52,6 +49,10 @@ impl Config {
 
         if maybe_config_exists.exists() {
             if let Ok(config) = Self::from_file(maybe_config_exists.as_path()) {
+                tracing::debug!(
+                    config = %maybe_config_exists.display(),
+                    "configuration file loaded"
+                );
                 return config;
             }
             tracing::error!(

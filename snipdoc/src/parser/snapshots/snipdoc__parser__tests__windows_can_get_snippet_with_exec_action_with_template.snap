@@ -1,0 +1,5 @@
+---
+source: snipdoc/src/parser/mod.rs
+expression: snippet.create_content(&action)
+---
+"calc\r\nresult:\r\n2"

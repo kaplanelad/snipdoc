@@ -1,0 +1,7 @@
+---
+source: snipdoc/src/walk.rs
+expression: file_paths
+---
+[
+    "folder/file.txt",
+]

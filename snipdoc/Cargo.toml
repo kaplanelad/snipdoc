@@ -30,6 +30,7 @@ serde_yaml = { version = "0.9.33" }
 serde_regex = { version = "1.1.0" }
 requestty = { version = "0.5.0", optional = true }
 dunce = "1.0.4"
+lazy_static = "1.4.0"
 
 # Cli
 clap = { version = "4.5.2", features = ["std", "derive"], optional = true }
@@ -53,3 +54,4 @@ required-features = ["cli"]
 insta = { version = "1.36.1", features = ["redactions", "filters"] }
 tree-fs = { version = "0.1.0" }
 trycmd = "0.15.0"
+rstest = "0.21.0"

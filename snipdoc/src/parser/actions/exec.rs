@@ -2,10 +2,25 @@ use std::{env, process::Command};
 
 pub fn run(command: &str) -> Result<String, String> {
     if approve_exec_command(command) {
-        tracing::debug!(command, "execute snippet  content");
-        match Command::new("sh").arg("-c").arg(command).output() {
-            Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).to_string()),
-            Err(e) => Err(e.to_string()),
+        tracing::debug!(command, "execute snippet content");
+
+        let res = if cfg!(target_os = "windows") {
+            Command::new("powershell")
+                .args(["-Command", command])
+                .output()
+                .map_err(|err| err.to_string())?
+        } else {
+            Command::new("sh")
+                .args(["-c", command])
+                .output()
+                .map_err(|err| err.to_string())?
+        };
+
+        if res.status.success() {
+            Ok(String::from_utf8_lossy(&res.stdout).to_string())
+        } else {
+            let err_msg = String::from_utf8_lossy(&res.stderr).to_string();
+            Err(err_msg)
         }
     } else {
         Err("command not approved".to_string())

@@ -1,0 +1,10 @@
+---
+source: snipdoc/src/walk.rs
+expression: file_paths
+---
+[
+    "file.txt",
+    "folder/file.txt",
+    "folder/folder/2.txt",
+    "README.md",
+]
