@@ -1,4 +1,4 @@
 snippets:
   EXEC:
-    content: echo '1+1'= $((1+1))
+    content: echo $((1+1))
     path: main.rs
