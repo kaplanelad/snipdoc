@@ -72,10 +72,9 @@ impl Snippet {
         #[cfg(not(feature = "exec"))]
         let content = self.content.to_string();
 
-        let content =
-            inject_actions
-                .template
-                .before_inject(&content, &inject_actions.kind, custom_templates);
+        let content = inject_actions
+            .template
+            .before_inject(&content, custom_templates);
 
         let content = content
             .lines()

@@ -1,5 +1,5 @@
 ---
 source: snipdoc/src/parser/mod.rs
-expression: snippet.create_content(&action)
+expression: "snippet.create_content(&action, &BTreeMap::new())"
 ---
-"calc result: 2"
+"```sh\ncalc result: 2\n```"
