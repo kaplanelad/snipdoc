@@ -2,3 +2,4 @@ snippets:
   title:
     content: '//! # Snipdoc: Code Documentation Made Simple'
     path: ./snipdoc.yml
+templates: {}

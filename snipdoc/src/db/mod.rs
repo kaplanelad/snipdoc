@@ -3,11 +3,30 @@ mod yaml;
 
 use std::collections::BTreeMap;
 
+use crate::parser::{collector::CollectSnippet, Snippet, SnippetTemplate};
 pub use code::Code;
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 pub use yaml::{Yaml, DEFAULT_FILE_NAME};
 
-use crate::parser::{collector::CollectSnippet, Snippet};
+lazy_static! {
+    pub static ref EMPTY_COLLECTED_SNIPPETS: Vec<CollectSnippet> = vec![CollectSnippet {
+        id: "SNIPPET_ID".to_string(),
+        inject_from: None,
+        tag_open: String::new(),
+        tag_close: String::new(),
+        snippet: vec![String::new()],
+    }];
+    pub static ref EMPTY_TEMPLATE_SNIPPETS: BTreeMap<String, SnippetTemplate> = BTreeMap::from([(
+        "TEMPLATE_ID".to_string(),
+        SnippetTemplate {
+            content: r"```sh
+{snippet}
+```"
+            .to_string(),
+        }
+    )]);
+}
 
 /// A trait that defines the behavior for database operations.
 pub trait Db {
@@ -33,12 +52,15 @@ pub trait Db {
     /// # Errors
     ///
     /// Return and [`Error`] when could not save the data
-    fn save(&self, snippets: &[&CollectSnippet]) -> Result<'_, ()>;
+    fn save(&self, _: &[&CollectSnippet], _: &BTreeMap<String, SnippetTemplate>) -> Result<'_, ()> {
+        Err(Error::NotSupported)
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct DBData {
     pub snippets: BTreeMap<String, Snippet>,
+    pub templates: BTreeMap<String, SnippetTemplate>,
 }
 
 #[derive(thiserror::Error, Debug)]

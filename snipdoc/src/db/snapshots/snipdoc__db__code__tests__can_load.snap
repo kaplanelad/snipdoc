@@ -18,5 +18,6 @@ Ok(
                 path: "README.md",
             },
         },
+        templates: {},
     },
 )

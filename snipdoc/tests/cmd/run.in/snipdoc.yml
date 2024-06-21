@@ -3,3 +3,11 @@ snippets:
     content: |-
       Inject from YAML file
     path: main.rs
+templates:
+  wrap_impl:
+    content: |-
+      ```rust
+      impl test {
+          {snippet}
+      }
+      ```

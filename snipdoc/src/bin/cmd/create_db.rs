@@ -18,7 +18,7 @@
 //!  snipdoc create-db
 //! ```
 
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 
 use snipdoc::{
     cli::CmdExit,
@@ -41,17 +41,10 @@ pub fn exec(config: &Config, collect_folder: &Path, empty: bool) -> CmdExit {
     let db_file_path = collect_folder.join(db::DEFAULT_FILE_NAME);
 
     let result = if empty {
-        let example_snippets = [CollectSnippet {
-            id: "EXAMPLE_ID".to_string(),
-            inject_from: None,
-            tag_open: String::new(),
-            tag_close: String::new(),
-            snippet: vec![String::new()],
-        }];
+        let example_snippet_refs: Vec<&CollectSnippet> =
+            db::EMPTY_COLLECTED_SNIPPETS.iter().collect();
 
-        let example_snippet_refs: Vec<&CollectSnippet> = example_snippets.iter().collect();
-
-        db::Yaml::new(&db_file_path).save(&example_snippet_refs)
+        db::Yaml::new(&db_file_path).save(&example_snippet_refs, &db::EMPTY_TEMPLATE_SNIPPETS)
     } else {
         let walk = match walk::Walk::from_config(collect_folder, &config.walk) {
             Ok(walk) => walk,
@@ -67,7 +60,7 @@ pub fn exec(config: &Config, collect_folder: &Path, empty: bool) -> CmdExit {
         let all_snippets: Vec<&snipdoc::parser::collector::CollectSnippet> =
             collector.snippets.values().flatten().collect();
 
-        db::Yaml::new(&db_file_path).save(&all_snippets)
+        db::Yaml::new(&db_file_path).save(&all_snippets, &BTreeMap::new())
     };
 
     if let Err(err) = result {

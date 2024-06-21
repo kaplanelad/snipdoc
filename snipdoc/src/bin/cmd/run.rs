@@ -70,7 +70,7 @@ pub fn run(
         }
     };
 
-    let mut snippets = db::Code::new(Collector::walk(&walk).snippets)
+    let mut db_data = db::Code::new(Collector::walk(&walk).snippets)
         .load()
         .unwrap();
 
@@ -88,7 +88,8 @@ pub fn run(
     // the existing  snippets
     if let Some(yaml_db) = &maybe_yaml_file {
         let snippets_from_yaml = yaml_db.load().unwrap();
-        snippets.snippets.extend(snippets_from_yaml.snippets);
+        db_data.snippets.extend(snippets_from_yaml.snippets);
+        db_data.templates = snippets_from_yaml.templates;
     }
 
     let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
@@ -99,7 +100,7 @@ pub fn run(
     };
 
     let inject_config = config.inject.clone().unwrap_or_default();
-    Ok(Injector::walk(&walk, &snippets, &inject_config))
+    Ok(Injector::walk(&walk, &db_data, &inject_config))
 }
 
 fn write_content(path: &Path, content: &str) -> std::io::Result<()> {

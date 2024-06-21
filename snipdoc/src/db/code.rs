@@ -3,7 +3,7 @@
 //! `snipdoc`.
 use std::{collections::BTreeMap, path::PathBuf};
 
-use super::{DBData, Db, Error, Result, Snippet};
+use super::{DBData, Db, Result, Snippet};
 use crate::parser::{collector::CollectSnippet, SnippetKind};
 
 pub struct Code {
@@ -38,11 +38,7 @@ impl Db for Code {
                 }
             }
         }
-
         Ok(data)
-    }
-    fn save(&self, _: &[&CollectSnippet]) -> Result<'_, ()> {
-        Err(Error::NotSupported)
     }
 }
 
@@ -81,6 +77,6 @@ mod tests {
             tag_close: "<!-- </snip> -->\n".to_string(),
         };
 
-        assert!(code.save(&[&save_snippets]).is_err());
+        assert!(code.save(&[&save_snippets], &BTreeMap::new()).is_err());
     }
 }

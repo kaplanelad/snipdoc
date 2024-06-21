@@ -3,7 +3,7 @@ pub mod collector;
 mod html_tag;
 pub mod injector;
 
-use std::{path::PathBuf, str::FromStr};
+use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
 
 use pest_derive::Parser;
 use serde::{Deserialize, Serialize};
@@ -21,6 +21,11 @@ pub struct Snippet {
     pub content: String,
     pub kind: SnippetKind,
     pub path: PathBuf,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SnippetTemplate {
+    pub content: String,
 }
 
 #[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
@@ -49,7 +54,11 @@ impl Snippet {
     /// Returns the snippet content, filtered based on `strip_prefix` if
     /// specified.
     #[must_use]
-    pub fn create_content(&self, inject_actions: &injector::InjectContentAction) -> String {
+    pub fn create_content(
+        &self,
+        inject_actions: &injector::InjectContentAction,
+        custom_templates: &BTreeMap<String, SnippetTemplate>,
+    ) -> String {
         #[cfg(feature = "exec")]
         let content = if inject_actions.kind == injector::InjectAction::Exec {
             exec::run(&self.content).unwrap_or_else(|err| {
@@ -63,9 +72,10 @@ impl Snippet {
         #[cfg(not(feature = "exec"))]
         let content = self.content.to_string();
 
-        let content = inject_actions
-            .template
-            .before_inject(&content, &inject_actions.kind);
+        let content =
+            inject_actions
+                .template
+                .before_inject(&content, &inject_actions.kind, custom_templates);
 
         let content = content
             .lines()
@@ -118,7 +128,7 @@ mod tests {
         };
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
+            assert_debug_snapshot!(snippet.create_content(&action, &BTreeMap::new()));
         });
     }
 
@@ -136,7 +146,25 @@ mod tests {
         };
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
+            assert_debug_snapshot!(snippet.create_content(&action, &BTreeMap::new()));
+        });
+    }
+
+    #[test]
+    fn can_get_snippet_content_with_custom_template_action() {
+        let snippet = tests_cfg::get_snippet();
+
+        let action = injector::InjectContentAction {
+            kind: InjectAction::Copy,
+            snippet_id: "id".to_string(),
+            inject_from: SnippetKind::Any,
+            strip_prefix: None,
+            add_prefix: None,
+            template: Template::new("CUSTOM_ID_1"),
+        };
+
+        with_settings!({filters => tests_cfg::redact::all()}, {
+            assert_debug_snapshot!(snippet.create_content(&action, &tests_cfg::get_custom_templates()));
         });
     }
 
@@ -154,7 +182,7 @@ mod tests {
         };
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
+            assert_debug_snapshot!(snippet.create_content(&action, &BTreeMap::new()));
         });
     }
 
@@ -172,7 +200,7 @@ mod tests {
         };
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
+            assert_debug_snapshot!(snippet.create_content(&action, &BTreeMap::new()));
         });
     }
 
@@ -190,7 +218,7 @@ mod tests {
         };
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(snippet.create_content(&action));
+            assert_debug_snapshot!(snippet.create_content(&action, &BTreeMap::new()));
         });
     }
 
@@ -211,7 +239,7 @@ mod tests {
 
         assert_debug_snapshot!(
             "unix_can_get_snippet_with_exec_action_with_template",
-            snippet.create_content(&action)
+            snippet.create_content(&action, &BTreeMap::new())
         );
     }
 
@@ -232,7 +260,7 @@ mod tests {
 
         assert_debug_snapshot!(
             "windows_can_get_snippet_with_exec_action_with_template",
-            snippet.create_content(&action)
+            snippet.create_content(&action, &BTreeMap::new())
         );
     }
 }

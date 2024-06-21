@@ -18,5 +18,6 @@ Ok(
                 path: "./snipdoc-snippets.yaml",
             },
         },
+        templates: {},
     },
 )

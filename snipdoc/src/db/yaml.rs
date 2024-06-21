@@ -9,7 +9,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 
 use super::{DBData, Db, Result, Snippet};
-use crate::parser::{collector::CollectSnippet, SnippetKind};
+use crate::parser::{collector::CollectSnippet, SnippetKind, SnippetTemplate};
 
 pub const DEFAULT_FILE_NAME: &str = "snipdoc.yml";
 
@@ -21,7 +21,10 @@ struct YamlSnippet {
 
 #[derive(Serialize, Deserialize, Default)]
 struct Data {
+    #[serde(default)]
     pub snippets: BTreeMap<String, YamlSnippet>,
+    #[serde(default)]
+    pub templates: BTreeMap<String, SnippetTemplate>,
 }
 
 pub struct Yaml {
@@ -56,7 +59,10 @@ impl Db for Yaml {
     fn load(&self) -> Result<'_, DBData> {
         let yaml_data: Data = serde_yaml::from_reader(std::fs::File::open(&self.path)?)?;
 
-        let mut data = DBData::default();
+        let mut data = DBData {
+            snippets: BTreeMap::new(),
+            templates: yaml_data.templates,
+        };
         for (id, snippet) in &yaml_data.snippets {
             data.snippets.insert(
                 id.clone(),
@@ -73,8 +79,15 @@ impl Db for Yaml {
     }
 
     /// Save snippets into a yaml file
-    fn save(&self, snippets: &[&CollectSnippet]) -> Result<'_, ()> {
-        let mut data = Data::default();
+    fn save(
+        &self,
+        snippets: &[&CollectSnippet],
+        templates: &BTreeMap<String, SnippetTemplate>,
+    ) -> Result<'_, ()> {
+        let mut data = Data {
+            snippets: BTreeMap::new(),
+            templates: templates.clone(),
+        };
 
         for snippet in snippets {
             // we should save only snippets and not the placeholders
@@ -109,6 +122,8 @@ mod tests {
     use super::*;
     #[cfg(not(windows))]
     use crate::tests_cfg;
+
+    use crate::db::EMPTY_TEMPLATE_SNIPPETS;
 
     #[test]
     fn can_load() {
@@ -156,7 +171,7 @@ mod tests {
         let yaml = Yaml::new(db_file_path.as_path());
         let snippets = tests_cfg::get_collect_snippets();
         let snippet_refs: Vec<&CollectSnippet> = snippets.iter().collect();
-        assert!(yaml.save(&snippet_refs).is_ok());
+        assert!(yaml.save(&snippet_refs, &EMPTY_TEMPLATE_SNIPPETS).is_ok());
         with_settings!({filters => {
            vec![(root_folder.display().to_string().as_str(), "[PATH]")]
         }}, {
