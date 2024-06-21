@@ -39,7 +39,7 @@ pub enum SnippetKind {
 }
 
 impl fmt::Display for SnippetKind {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{self:?}")
     }
 }
