@@ -102,46 +102,39 @@ impl Template {
     pub fn before_inject(
         &self,
         content: &str,
-        action: &InjectAction,
         custom_templates: &BTreeMap<String, SnippetTemplate>,
     ) -> String {
-        match action {
-            InjectAction::Copy => {
-                let template = match self {
-                    Self::Default => content.to_string(),
-                    Self::Text => r"```text\n{snippet}\n```".to_string(),
-                    Self::Json => r"```json\n{snippet}\n```".to_string(),
-                    Self::Yaml => r"```yaml\n{snippet}\n```".to_string(),
-                    Self::Toml => r"```toml\n{snippet}\n```".to_string(),
-                    Self::Html => r"```html\n{snippet}\n```".to_string(),
-                    Self::Rust => r"```rust\n{snippet}\n```".to_string(),
-                    Self::Python => r"```python\n{snippet}\n```".to_string(),
-                    Self::Go => r"```go\n{snippet}\n```".to_string(),
-                    Self::Sql => r"```sql\n{snippet}\n```".to_string(),
-                    Self::Shell => r"```shell\n{snippet}\n```".to_string(),
-                    Self::Bash => r"```bash\n{snippet}\n```".to_string(),
-                    Self::Sh => r"```sh\n{snippet}\n```".to_string(),
-                    Self::Custom(template) => custom_templates.get(template).map_or_else(
-                        || template.clone(),
-                        |custom_template| custom_template.content.clone(),
-                    ),
-                };
+        let template = match self {
+            Self::Default => content.to_string(),
+            Self::Text => r"```text\n{snippet}\n```".to_string(),
+            Self::Json => r"```json\n{snippet}\n```".to_string(),
+            Self::Yaml => r"```yaml\n{snippet}\n```".to_string(),
+            Self::Toml => r"```toml\n{snippet}\n```".to_string(),
+            Self::Html => r"```html\n{snippet}\n```".to_string(),
+            Self::Rust => r"```rust\n{snippet}\n```".to_string(),
+            Self::Python => r"```python\n{snippet}\n```".to_string(),
+            Self::Go => r"```go\n{snippet}\n```".to_string(),
+            Self::Sql => r"```sql\n{snippet}\n```".to_string(),
+            Self::Shell => r"```shell\n{snippet}\n```".to_string(),
+            Self::Bash => r"```bash\n{snippet}\n```".to_string(),
+            Self::Sh => r"```sh\n{snippet}\n```".to_string(),
+            Self::Custom(template) => custom_templates.get(template).map_or_else(
+                || template.clone(),
+                |custom_template| custom_template.content.clone(),
+            ),
+        };
 
-                RE_SNIPPET_TEMPLATE_PLACEHOLDER
-                    .replace_all(&template, |caps: &regex::Captures<'_>| {
-                        let indent = caps.get(1).map_or("", |m| m.as_str());
-                        let snippet_lines = content
-                            .lines()
-                            .map(|line| format!("{indent}{line}"))
-                            .collect::<Vec<_>>()
-                            .join(LINE_ENDING);
-                        snippet_lines
-                    })
-                    .replace("\\n", LINE_ENDING)
-            }
-            #[cfg(feature = "exec")]
-            InjectAction::Exec => content.to_string(),
-        }
+        RE_SNIPPET_TEMPLATE_PLACEHOLDER
+            .replace_all(&template, |caps: &regex::Captures<'_>| {
+                let indent = caps.get(1).map_or("", |m| m.as_str());
+                let snippet_lines = content
+                    .lines()
+                    .map(|line| format!("{indent}{line}"))
+                    .collect::<Vec<_>>()
+                    .join(LINE_ENDING);
+                snippet_lines
+            })
+            .replace("\\n", LINE_ENDING)
     }
 
     #[must_use]
