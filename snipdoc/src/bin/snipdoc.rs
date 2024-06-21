@@ -3,8 +3,7 @@ mod cmd;
 use clap::{ArgAction, Parser, Subcommand};
 use snipdoc::{config::Config, parser::SnippetKind, reporters};
 use tracing::level_filters::LevelFilter;
-use tracing_subscriber::EnvFilter;
-
+mod logger;
 #[derive(clap::ValueEnum, Default, Clone)]
 pub enum Format {
     Table,
@@ -32,7 +31,7 @@ impl Format {
 struct Cli {
     #[arg(global = true, short, long, value_enum, default_value = "INFO")]
     /// Log level
-    log_level: LevelFilter,
+    log: LevelFilter,
 
     /// Source code directory for collecting documentation
     #[clap(global = true, index = 1, default_value = ".")]
@@ -88,15 +87,7 @@ enum Commands {
 fn main() {
     let app: Cli = Cli::parse();
 
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::builder()
-                .with_default_directive(app.log_level.into())
-                .from_env_lossy(),
-        )
-        .with_line_number(true)
-        .with_target(true)
-        .init();
+    logger::init(app.log);
 
     let span = tracing::span!(tracing::Level::INFO, "cli");
     let _guard = span.enter();

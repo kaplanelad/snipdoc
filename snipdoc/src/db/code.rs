@@ -38,6 +38,8 @@ impl Db for Code {
                 }
             }
         }
+
+        tracing::debug!(count = data.snippets.len(), "collected code snippets");
         Ok(data)
     }
 }

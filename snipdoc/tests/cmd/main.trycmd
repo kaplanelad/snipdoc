@@ -16,10 +16,10 @@ Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]
 
 Options:
-  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
-  -c, --config <CONFIG>        Application config. by default will search `./snipdoc-config.yml`
-  -h, --help                   Print help
-  -V, --version                Print version
+  -l, --log <LOG>        Log level [default: INFO]
+  -c, --config <CONFIG>  Application config. by default will search `./snipdoc-config.yml`
+  -h, --help             Print help
+  -V, --version          Print version
 
 ```
 
@@ -40,10 +40,10 @@ Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]
 
 Options:
-  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
-  -c, --config <CONFIG>        Application config. by default will search `./snipdoc-config.yml`
-  -h, --help                   Print help
-  -V, --version                Print version
+  -l, --log <LOG>        Log level [default: INFO]
+  -c, --config <CONFIG>  Application config. by default will search `./snipdoc-config.yml`
+  -h, --help             Print help
+  -V, --version          Print version
 
 ```
 
@@ -57,11 +57,11 @@ Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]
 
 Options:
-      --empty                  Show the injection operation without changes
-  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
-  -c, --config <CONFIG>        Application config. by default will search `./snipdoc-config.yml`
-  -h, --help                   Print help
-  -V, --version                Print version
+      --empty            Show the injection operation without changes
+  -l, --log <LOG>        Log level [default: INFO]
+  -c, --config <CONFIG>  Application config. by default will search `./snipdoc-config.yml`
+  -h, --help             Print help
+  -V, --version          Print version
 
 ```
 
@@ -75,13 +75,13 @@ Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]
 
 Options:
-      --db-file <DB_FILE>      
-  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
-  -c, --config <CONFIG>        Application config. by default will search `./snipdoc-config.yml`
-      --dry-run                Show the injection operation without changes
-      --format <FORMAT>        Format of the results [default: console] [possible values: table, console]
-  -h, --help                   Print help
-  -V, --version                Print version
+      --db-file <DB_FILE>  
+  -l, --log <LOG>          Log level [default: INFO]
+  -c, --config <CONFIG>    Application config. by default will search `./snipdoc-config.yml`
+      --dry-run            Show the injection operation without changes
+      --format <FORMAT>    Format of the results [default: console] [possible values: table, console]
+  -h, --help               Print help
+  -V, --version            Print version
 
 ```
 
@@ -95,12 +95,12 @@ Arguments:
   [PATH]  Source code directory for collecting documentation [default: .]
 
 Options:
-      --from <FROM>            [default: any] [possible values: yaml, code, any]
-  -l, --log-level <LOG_LEVEL>  Log level [default: INFO]
-  -c, --config <CONFIG>        Application config. by default will search `./snipdoc-config.yml`
-      --db-file <DB_FILE>      
-      --format <FORMAT>        Format of the results [default: console] [possible values: table, console]
-  -h, --help                   Print help
-  -V, --version                Print version
+      --from <FROM>        [default: any] [possible values: yaml, code, any]
+  -l, --log <LOG>          Log level [default: INFO]
+  -c, --config <CONFIG>    Application config. by default will search `./snipdoc-config.yml`
+      --db-file <DB_FILE>  
+      --format <FORMAT>    Format of the results [default: console] [possible values: table, console]
+  -h, --help               Print help
+  -V, --version            Print version
 
 ```

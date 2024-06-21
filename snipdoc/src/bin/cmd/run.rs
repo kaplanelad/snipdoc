@@ -37,6 +37,8 @@ pub fn exec(
     dry_run: bool,
     format: &Format,
 ) -> CmdExit {
+    let span = tracing::span!(tracing::Level::INFO, "run");
+    let _guard = span.enter();
     let injector = match run(config, inject_folder, db_file) {
         Ok(i) => i,
         Err(err) => {
@@ -90,6 +92,11 @@ pub fn run(
         let snippets_from_yaml = yaml_db.load().unwrap();
         db_data.snippets.extend(snippets_from_yaml.snippets);
         db_data.templates = snippets_from_yaml.templates;
+        tracing::debug!(
+            snippet_count = db_data.snippets.len(),
+            template_count = db_data.templates.len(),
+            "yaml file loaded successfully"
+        );
     }
 
     let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
@@ -99,8 +106,7 @@ pub fn run(
         }
     };
 
-    let inject_config = config.inject.clone().unwrap_or_default();
-    Ok(Injector::walk(&walk, &db_data, &inject_config))
+    Ok(Injector::walk(&walk, &db_data, &config.inject))
 }
 
 fn write_content(path: &Path, content: &str) -> std::io::Result<()> {

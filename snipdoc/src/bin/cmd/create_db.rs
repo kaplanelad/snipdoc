@@ -35,7 +35,7 @@ use snipdoc::{
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
 pub fn exec(config: &Config, collect_folder: &Path, empty: bool) -> CmdExit {
-    let span = tracing::span!(tracing::Level::INFO, "collect", empty);
+    let span = tracing::span!(tracing::Level::INFO, "create-db", empty);
     let _guard = span.enter();
 
     let db_file_path = collect_folder.join(db::DEFAULT_FILE_NAME);

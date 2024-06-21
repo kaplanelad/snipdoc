@@ -15,6 +15,8 @@ use super::{super::Format, run::run};
 /// This function returns a [`CmdExit`] indicating the success or failure
 /// of the execution.
 pub fn exec(config: &Config, inject_folder: &Path, db_file: Option<PathBuf>) -> CmdExit {
+    let span = tracing::span!(tracing::Level::INFO, "checks");
+    let _guard = span.enter();
     let injector = match run(config, inject_folder, db_file) {
         Ok(i) => i,
         Err(err) => {

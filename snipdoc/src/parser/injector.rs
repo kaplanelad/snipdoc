@@ -149,24 +149,30 @@ impl Template {
 
 impl InjectContentAction {
     pub fn new(attributes: &BTreeMap<String, String>) -> Option<Self> {
-        let snippet_id = attributes.get("id").or({
-            tracing::debug!(
-                attributes = format!("{:?}", attributes),
-                "attribute id not found in the given attributes"
-            );
-            None
-        })?;
+        let snippet_id = attributes.get("id").map_or_else(
+            || {
+                tracing::debug!(
+                    attributes = format!("{:?}", attributes),
+                    "attribute id not found in the given attributes"
+                );
+                None
+            },
+            Some,
+        )?;
 
-        let inject_from = attributes.get(INJECT_FROM_ATTRIBUTE_NAME).or({
-            tracing::debug!(
-                attributes = format!("{:?}", attributes),
-                "attribute inject_from not found in the given attributes"
-            );
-            None
-        })?;
+        let inject_from = attributes.get(INJECT_FROM_ATTRIBUTE_NAME).map_or_else(
+            || {
+                tracing::trace!(
+                    attributes = format!("{:?}", attributes),
+                    "skip injection snippet. `inject_from` not found"
+                );
+                None
+            },
+            Some,
+        )?;
 
         let Ok(inject_from) = SnippetKind::from_str(inject_from) else {
-            tracing::debug!(inject_from, "invalid inject_from kind.");
+            tracing::debug!(inject_from, " unsupported inject_from value.");
             return None;
         };
 
@@ -308,11 +314,20 @@ impl<'a> Injector<'a> {
     /// within the provided `Walk`.
     #[must_use]
     pub fn walk(walk: &Walk, db_data: &DBData, config: &InjectConfig) -> InjectorResult {
-        let results = walk
-            .get_files()
+        let files = walk.get_files();
+        tracing::debug!(
+            count_files = files.len(),
+            path = %walk.folder.display(),
+            "start inject snippets"
+        );
+
+        let results = files
             .par_iter()
             .filter_map(|path| match RFile::new(path) {
                 Ok(r_file) => {
+                    let span = tracing::info_span!("inject", path = %path.display());
+                    let _guard = span.enter();
+
                     let status =
                         Self::inject(walk.folder.as_path(), &r_file.content, config, db_data);
                     Some((path.clone(), status))
@@ -345,12 +360,11 @@ impl<'a> Injector<'a> {
                     tracing::debug!("not found inject content");
                     InjectedContent::None
                 } else {
-                    tracing::debug!("content injected");
                     InjectedContent::Injected(summary)
                 }
             }
             Err(err) => {
-                tracing::debug!(err = %err, "could not parse the given content");
+                tracing::debug!(err = %err, "could not pars the file. invalid schema");
                 InjectedContent::Error(err.to_string())
             }
         }
@@ -438,16 +452,29 @@ impl<'a> Injector<'a> {
                             summary.content.write_str(&inject_result)?;
 
                             if Self::is_str_equal(pair.as_str(), &inject_result) {
+                                tracing::debug!(
+                                    snippet_id = inject_actions.snippet_id,
+                                    "equal snippet value"
+                                );
                                 summary.actions.push(InjectStatus::Equal {
                                     snippet_id: inject_actions.snippet_id.to_string(),
                                 });
                             } else {
+                                tracing::debug!(
+                                    snippet_id = inject_actions.snippet_id,
+                                    "snippet content replaced"
+                                );
                                 summary.actions.push(InjectStatus::Injected {
                                     snippet_id: inject_actions.snippet_id.to_string(),
                                     content: snippet_content,
                                 });
                             }
                         } else {
+                            tracing::debug!(
+                                snippet_id = inject_actions.snippet_id,
+                                kind = %snippet.kind,
+                                "not found snipper to inject with same inject_from value"
+                            );
                             // summary.actions.push(InjectStatus::NotFound {
                             //     snippet_id: inject_actions.snippet_id.to_string(),
                             //     snippet_kind: inject_actions.inject_from,
@@ -455,6 +482,10 @@ impl<'a> Injector<'a> {
                             summary.content.write_str(pair.as_str())?;
                         }
                     } else {
+                        tracing::debug!(
+                            snippet_id = inject_actions.snippet_id,
+                            "not found snipper to inject"
+                        );
                         summary.actions.push(InjectStatus::NotFound {
                             snippet_id: inject_actions.snippet_id.to_string(),
                             snippet_kind: inject_actions.inject_from,
