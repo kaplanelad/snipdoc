@@ -128,7 +128,7 @@ impl Template {
                 };
 
                 RE_SNIPPET_TEMPLATE_PLACEHOLDER
-                    .replace_all(&template, |caps: &regex::Captures| {
+                    .replace_all(&template, |caps: &regex::Captures<'_>| {
                         let indent = caps.get(1).map_or("", |m| m.as_str());
                         let snippet_lines = content
                             .lines()
