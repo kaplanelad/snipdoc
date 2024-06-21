@@ -61,6 +61,11 @@ Expected to inject the content of the snippet with the pre-defined template
 <!-- </snip> -->
 
 
+<!-- <snip id="rust-print" inject_from="code" template="wrap_impl"> -->
+```rust
+
+```
+<!-- </snip> -->
 
 Expected to inject the content of the snippet with the given template with a different comment tag
 # <snip id="config-template" inject_from="code" template="```yaml \n {snippet} \n ```"> 

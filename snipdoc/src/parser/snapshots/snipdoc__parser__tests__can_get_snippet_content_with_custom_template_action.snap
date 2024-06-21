@@ -1,0 +1,5 @@
+---
+source: snipdoc/src/parser/mod.rs
+expression: "snippet.create_content(&action, &tests_cfg::get_custom_templates())"
+---
+"---> $ cargo install snipdoc[NEW_LINE]$ snipdoc --version"

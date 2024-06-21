@@ -1,7 +1,6 @@
 use std::{
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
     fmt::Write,
-    hash::BuildHasher,
     path::{Path, PathBuf},
     str::FromStr,
 };
@@ -12,12 +11,11 @@ use rayon::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use super::{html_tag, Rule};
 use crate::{
     config::InjectConfig,
     db::DBData,
     errors::ParserResult,
-    parser::{Snippet, SnippetKind, SnippetParse},
+    parser::{html_tag, Rule, SnippetKind, SnippetParse, SnippetTemplate},
     read_file::RFile,
     walk::Walk,
     LINE_ENDING,
@@ -25,6 +23,8 @@ use crate::{
 
 lazy_static! {
     static ref RE_NORMALIZE_TEXT: Regex = Regex::new(r"[\s\r\n]+").unwrap();
+    static ref RE_SNIPPET_TEMPLATE_PLACEHOLDER: Regex =
+        Regex::new(r"(?m)(^\s*|)\{\s*snippet\}").unwrap();
 }
 
 const INJECT_ACTION: &str = "action";
@@ -99,7 +99,12 @@ impl Template {
     }
 
     #[must_use]
-    pub fn before_inject(&self, content: &str, action: &InjectAction) -> String {
+    pub fn before_inject(
+        &self,
+        content: &str,
+        action: &InjectAction,
+        custom_templates: &BTreeMap<String, SnippetTemplate>,
+    ) -> String {
         match action {
             InjectAction::Copy => {
                 let template = match self {
@@ -116,11 +121,22 @@ impl Template {
                     Self::Shell => r"```shell\n{snippet}\n```".to_string(),
                     Self::Bash => r"```bash\n{snippet}\n```".to_string(),
                     Self::Sh => r"```sh\n{snippet}\n```".to_string(),
-
-                    Self::Custom(template) => template.clone(),
+                    Self::Custom(template) => custom_templates.get(template).map_or_else(
+                        || template.clone(),
+                        |custom_template| custom_template.content.clone(),
+                    ),
                 };
-                template
-                    .replace("{snippet}", content)
+
+                RE_SNIPPET_TEMPLATE_PLACEHOLDER
+                    .replace_all(&template, |caps: &regex::Captures| {
+                        let indent = caps.get(1).map_or("", |m| m.as_str());
+                        let snippet_lines = content
+                            .lines()
+                            .map(|line| format!("{indent}{line}"))
+                            .collect::<Vec<_>>()
+                            .join(LINE_ENDING);
+                        snippet_lines
+                    })
                     .replace("\\n", LINE_ENDING)
             }
             #[cfg(feature = "exec")]
@@ -201,6 +217,7 @@ pub struct Injector<'a> {
     pub base_folder: &'a Path,
     pub input: &'a str,
     pub config: &'a InjectConfig,
+    pub db_data: &'a DBData,
 }
 
 /// Represents the inject status result
@@ -280,11 +297,17 @@ impl InjectSnippets {
 impl<'a> Injector<'a> {
     /// Constructs a new [`ParseFile`] with the provided input.
     #[must_use]
-    pub const fn new(base_folder: &'a Path, input: &'a str, config: &'a InjectConfig) -> Self {
+    pub const fn new(
+        base_folder: &'a Path,
+        input: &'a str,
+        config: &'a InjectConfig,
+        db_data: &'a DBData,
+    ) -> Self {
         Self {
             base_folder,
             input,
             config,
+            db_data,
         }
     }
 
@@ -292,23 +315,13 @@ impl<'a> Injector<'a> {
     /// within the provided `Walk`.
     #[must_use]
     pub fn walk(walk: &Walk, db_data: &DBData, config: &InjectConfig) -> InjectorResult {
-        let mut snippets_from = HashMap::new();
-
-        for (snippet_id, snippet_data) in &db_data.snippets {
-            snippets_from.insert(snippet_id.clone(), snippet_data);
-        }
-
         let results = walk
             .get_files()
             .par_iter()
             .filter_map(|path| match RFile::new(path) {
                 Ok(r_file) => {
-                    let status = Self::inject(
-                        walk.folder.as_path(),
-                        &r_file.content,
-                        &snippets_from,
-                        config,
-                    );
+                    let status =
+                        Self::inject(walk.folder.as_path(), &r_file.content, config, db_data);
                     Some((path.clone(), status))
                 }
                 Err(_err) => None,
@@ -330,10 +343,10 @@ impl<'a> Injector<'a> {
     pub fn inject(
         base_folder: &Path,
         input: &str,
-        snippets: &HashMap<String, &Snippet>,
         config: &InjectConfig,
+        db_data: &DBData,
     ) -> InjectedContent {
-        match Injector::new(base_folder, input, config).run(snippets) {
+        match Injector::new(base_folder, input, config, db_data).run() {
             Ok(summary) => {
                 if summary.actions.is_empty() {
                     tracing::debug!("not found inject content");
@@ -357,11 +370,11 @@ impl<'a> Injector<'a> {
     ///
     /// This function may return an error if it fails to parse the input file.
     /// Other errors encountered during parsing will be logged.
-    pub fn run(&self, snippets: &HashMap<String, &Snippet>) -> ParserResult<'_, InjectSummary> {
+    pub fn run(&self) -> ParserResult<'_, InjectSummary> {
         let pairs = SnippetParse::parse(Rule::file, self.input)?;
 
         let mut inject_summary = InjectSummary::default();
-        self.inject_snippets(pairs, &mut inject_summary, snippets)?;
+        self.inject_snippets(pairs, &mut inject_summary)?;
 
         Ok(inject_summary)
     }
@@ -384,11 +397,10 @@ impl<'a> Injector<'a> {
     /// In testing scenarios, this panic should be captured to ensure the
     /// correctness of the parser.
     #[allow(clippy::only_used_in_recursion)]
-    fn inject_snippets<S: BuildHasher>(
+    fn inject_snippets(
         &self,
         pairs: Pairs<'a, Rule>,
         summary: &'a mut InjectSummary,
-        snippets: &'a HashMap<String, &'a Snippet, S>,
     ) -> ParserResult<'a, ()> {
         if pairs.len() == 0 {
             return Ok(());
@@ -414,11 +426,12 @@ impl<'a> Injector<'a> {
                 let inject_content_actions = InjectContentAction::new(&attributes);
 
                 if let Some(inject_actions) = inject_content_actions {
-                    if let Some(snippet) = snippets.get(&inject_actions.snippet_id) {
+                    if let Some(snippet) = self.db_data.snippets.get(&inject_actions.snippet_id) {
                         if inject_actions.inject_from == SnippetKind::Any
                             || inject_actions.inject_from == snippet.kind
                         {
-                            let snippet_content = snippet.create_content(&inject_actions);
+                            let snippet_content =
+                                snippet.create_content(&inject_actions, &self.db_data.templates);
 
                             let comment_tag = html_tag::get_comment_tag_open(&children);
                             let close_tag_of_tag_open =
@@ -459,7 +472,7 @@ impl<'a> Injector<'a> {
                     summary.content.write_str(pair.as_str())?;
                 }
             } else {
-                self.inject_snippets(inner.clone(), summary, snippets)?;
+                self.inject_snippets(inner.clone(), summary)?;
                 if inner.len() == 0 {
                     summary.content.write_str(pair.as_str())?;
                 }
@@ -479,7 +492,7 @@ mod tests {
     use insta::{assert_debug_snapshot, with_settings};
 
     use super::*;
-    use crate::tests_cfg;
+    use crate::{parser::Snippet, tests_cfg};
 
     #[test]
     fn get_inject() {
@@ -523,15 +536,22 @@ not-found
 
 "#;
 
+        let snippets: BTreeMap<String, Snippet> = tests_cfg::get_snippet_to_inject();
         let inject_config = InjectConfig::default();
         let base_inject_path = PathBuf::from(".");
-        let injector = Injector::new(base_inject_path.as_path(), content, &inject_config);
-        let snippets: HashMap<String, Snippet> = tests_cfg::get_snippet_to_inject();
-        let snippet_refs: HashMap<String, &Snippet> =
-            snippets.iter().map(|(k, v)| (k.clone(), v)).collect();
+        let db_data = DBData {
+            snippets,
+            templates: BTreeMap::new(),
+        };
+        let injector = Injector::new(
+            base_inject_path.as_path(),
+            content,
+            &inject_config,
+            &db_data,
+        );
 
         with_settings!({filters => tests_cfg::redact::all()}, {
-            assert_debug_snapshot!(injector.run(&snippet_refs));
+            assert_debug_snapshot!(injector.run());
         });
     }
 }

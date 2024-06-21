@@ -1,6 +1,6 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::BTreeMap, path::PathBuf};
 pub mod redact;
-use crate::parser::{collector::CollectSnippet, Snippet, SnippetKind};
+use crate::parser::{collector::CollectSnippet, Snippet, SnippetKind, SnippetTemplate};
 
 #[must_use]
 pub fn get_collect_snippets() -> Vec<CollectSnippet> {
@@ -34,6 +34,24 @@ pub fn get_collect_snippets() -> Vec<CollectSnippet> {
 }
 
 #[must_use]
+pub fn get_custom_templates() -> BTreeMap<String, SnippetTemplate> {
+    BTreeMap::from([
+        (
+            "CUSTOM_ID_1".to_string(),
+            SnippetTemplate {
+                content: "---> {snippet}".to_string(),
+            },
+        ),
+        (
+            "CUSTOM_ID_2".to_string(),
+            SnippetTemplate {
+                content: "({snippet})".to_string(),
+            },
+        ),
+    ])
+}
+
+#[must_use]
 pub fn get_snippet() -> Snippet {
     Snippet {
         id: "test".to_string(),
@@ -44,8 +62,8 @@ pub fn get_snippet() -> Snippet {
 }
 
 #[must_use]
-pub fn get_snippet_to_inject() -> HashMap<String, Snippet> {
-    HashMap::from([
+pub fn get_snippet_to_inject() -> BTreeMap<String, Snippet> {
+    BTreeMap::from([
         (
             "description".to_string(),
             Snippet {
