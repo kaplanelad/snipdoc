@@ -13,7 +13,8 @@ pub const DEFAULT_CONFIG_NAME: &str = "snipdoc-config.yml";
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Config {
     pub walk: WalkConfig,
-    pub inject: Option<InjectConfig>,
+    #[serde(default)]
+    pub inject: InjectConfig,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
@@ -48,21 +49,26 @@ impl Config {
         let maybe_config_exists = path.join(DEFAULT_CONFIG_NAME);
 
         if maybe_config_exists.exists() {
-            if let Ok(config) = Self::from_file(maybe_config_exists.as_path()) {
-                tracing::debug!(
-                    config = %maybe_config_exists.display(),
-                    "configuration file loaded"
-                );
-                return config;
+            match Self::from_file(maybe_config_exists.as_path()) {
+                Ok(config) => {
+                    tracing::debug!(
+                        path = %maybe_config_exists.display(),
+                        "config file loaded"
+                    );
+                    return config;
+                }
+                Err(err) => {
+                    tracing::error!(
+                        path = %maybe_config_exists.display(),
+                        err = %err,
+                        "invalid config file content"
+                    );
+                }
             }
-            tracing::error!(
-                config = %maybe_config_exists.display(),
-                "invalid config file content"
-            );
         } else {
             tracing::debug!(
-                config = %maybe_config_exists.display(),
-                "default config file not found"
+                path = %maybe_config_exists.display(),
+                "config not exists"
             );
         }
         Self::default()

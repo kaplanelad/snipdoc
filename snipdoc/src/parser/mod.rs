@@ -3,6 +3,7 @@ pub mod collector;
 mod html_tag;
 pub mod injector;
 
+use core::fmt;
 use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
 
 use pest_derive::Parser;
@@ -35,6 +36,12 @@ pub enum SnippetKind {
     Code,
     #[default]
     Any,
+}
+
+impl fmt::Display for SnippetKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{self:?}")
+    }
 }
 
 impl FromStr for SnippetKind {

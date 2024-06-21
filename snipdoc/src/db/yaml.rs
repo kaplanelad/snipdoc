@@ -43,8 +43,10 @@ impl Yaml {
     pub fn try_from_default_file(path: &Path) -> Option<Self> {
         let maybe_file = path.join(DEFAULT_FILE_NAME);
         if maybe_file.exists() {
+            tracing::debug!("{DEFAULT_FILE_NAME} file found");
             Some(Self::new(maybe_file.as_path()))
         } else {
+            tracing::debug!("{DEFAULT_FILE_NAME} file not found");
             None
         }
     }

@@ -55,8 +55,13 @@ impl<'a> Collector<'a> {
     /// within the provided `Walk`.
     #[must_use]
     pub fn walk(walk: &Walk) -> CollectSnippetsResults {
-        let snippets = walk
-            .get_files()
+        let files = walk.get_files();
+
+        tracing::debug!(
+            count_files = files.len(),
+            "start collect snippets from code"
+        );
+        let snippets = files
             .par_iter()
             .flat_map(|path| Self::file(path.as_path()).map(|findings| (path.clone(), findings)))
             .collect::<BTreeMap<_, _>>();
@@ -126,7 +131,6 @@ impl<'a> Collector<'a> {
                     let tag_open = html_tag::get_tag_open(&children);
                     let tag_close = html_tag::get_tag_close(children.clone());
 
-                    tracing::debug!(tag_open, "found open tag");
                     let attributes = match html_tag::get_tag_attributes(tag_open) {
                         Ok(attributes) => attributes,
                         Err(err) => {
@@ -137,6 +141,7 @@ impl<'a> Collector<'a> {
 
                     tracing::debug!(
                         tag_open,
+                        tag_close,
                         attributes = format!("{:#?}", attributes),
                         "found attributes"
                     );
@@ -152,6 +157,7 @@ impl<'a> Collector<'a> {
 
                     if let Some(last) = lines.last() {
                         if last == &tag_close.replace('\n', "") {
+                            // TODO:: replace \n to crate::LINE_ENDING
                             lines.pop();
                         }
                     }

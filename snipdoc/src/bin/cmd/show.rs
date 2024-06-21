@@ -25,6 +25,8 @@ pub fn exec(
     db_file: Option<PathBuf>,
     format: &Format,
 ) -> CmdExit {
+    let span = tracing::span!(tracing::Level::INFO, "show");
+    let _guard = span.enter();
     // collect first snippets from code
     let walk = match walk::Walk::from_config(inject_folder, &config.walk) {
         Ok(walk) => walk,
