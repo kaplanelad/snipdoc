@@ -23,7 +23,7 @@ To collect and replace all snippets from multiple data sources, use:
 ```sh
 snipdoc run
 ```
-For a detailed guide on how it works, follow this [guid](./docs/inject/)
+For a detailed guide on how it works, follow this [guide](./docs/inject/)
  
 ### Inject Options
 Snipdoc provides several attributes to customize snippet injection:
