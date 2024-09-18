@@ -11,6 +11,9 @@ env:
   REPO_NAME: kaplanelad/snipdoc
   BREW_TAP: kaplanelad/homebrew-tap
 
+env:
+  RUST_TOOLCHAIN: 1.79.0
+
 jobs:
   dist:
     name: Dist
@@ -22,24 +25,19 @@ jobs:
         include:
         - build: x86_64-linux
           os: ubuntu-20.04
-          rust: stable
           target: x86_64-unknown-linux-gnu
           cross: false
         - build: x86_64-macos
           os: macos-latest
-          rust: stable
           target: x86_64-apple-darwin
           cross: false
         - build: x86_64-windows
           os: windows-latest
-          rust: stable
           target: x86_64-pc-windows-msvc
           cross: false
         - build: aarch64-macos
           os: macos-latest
-          rust: stable
           target: aarch64-apple-darwin
-
 
     steps:
       - name: Checkout sources
@@ -47,27 +45,16 @@ jobs:
         with:
           submodules: true
 
-      - name: Install ${{ matrix.rust }} toolchain
-        uses: actions-rs/toolchain@v1
+      - name: Install ${{ env.RUST_TOOLCHAIN }} toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true  
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Build default release binary
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.cross }}
-          command: build
-          args: --release --locked --target ${{ matrix.target }}
+        run: cargo build --release --locked --target ${{ matrix.target }}
 
       - name: Build exec feature release binary
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.cross }}
-          command: build
-          args: --release --features exec --locked --target-dir target/${{ matrix.target }}/exec-feature
+        run: cargo build --release --features exec --locked --target-dir target/${{ matrix.target }}/exec-feature
 
       - name: Build archive
         shell: bash
